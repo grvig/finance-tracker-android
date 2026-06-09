@@ -1,7 +1,12 @@
 package com.grvig.financetracker.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "recurring_expenses")
 data class RecurringExpense(
-    val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val title: String,
     val amount: Double,
     val category: String,
