@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,21 +19,19 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ExpenseListScreen(
-    expenseViewModel: ExpenseViewModel
+    expenseViewModel: ExpenseViewModel,
+    onAddExpenseClick: () -> Unit
 ) {
 
     var expenses by remember {
-        mutableStateOf<List<Expense>>(
-            emptyList()
-        )
+        mutableStateOf<List<Expense>>(emptyList())
     }
 
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         scope.launch {
-            expenses =
-                expenseViewModel.getAllExpenses()
+            expenses = expenseViewModel.getAllExpenses()
         }
     }
 
@@ -45,6 +44,15 @@ fun ExpenseListScreen(
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(16.dp)
         )
+
+        Button(
+            onClick = onAddExpenseClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Text("Add New Expense")
+        }
 
         LazyColumn {
 
@@ -63,21 +71,10 @@ fun ExpenseListScreen(
                         modifier = Modifier.padding(12.dp)
                     ) {
 
-                        Text(
-                            text = "₹${expense.amount}"
-                        )
-
-                        Text(
-                            text = expense.category
-                        )
-
-                        Text(
-                            text = expense.paymentMethod
-                        )
-
-                        Text(
-                            text = expense.description
-                        )
+                        Text("₹${expense.amount}")
+                        Text(expense.category)
+                        Text(expense.paymentMethod)
+                        Text(expense.description)
                     }
                 }
             }

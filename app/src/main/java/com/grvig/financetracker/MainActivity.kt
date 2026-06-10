@@ -3,6 +3,7 @@ package com.grvig.financetracker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModelProvider
 import com.grvig.financetracker.database.DatabaseProvider
 import com.grvig.financetracker.repository.ExpenseRepository
@@ -35,10 +36,32 @@ class MainActivity : ComponentActivity() {
         setContent {
             FinanceTrackerTheme {
 
-                ExpenseListScreen(
-                    expenseViewModel = expenseViewModel
-                )
+                var currentScreen by remember {
+                    mutableStateOf(Screen.ADD_EXPENSE)
+                }
 
+                when (currentScreen) {
+
+                    Screen.ADD_EXPENSE -> {
+                        AddExpenseScreen(
+                            expenseViewModel = expenseViewModel,
+                            onViewExpensesClick = {
+                                currentScreen =
+                                    Screen.EXPENSE_LIST
+                            }
+                        )
+                    }
+
+                    Screen.EXPENSE_LIST -> {
+                        ExpenseListScreen(
+                            expenseViewModel = expenseViewModel,
+                            onAddExpenseClick = {
+                                currentScreen =
+                                    Screen.ADD_EXPENSE
+                            }
+                        )
+                    }
+                }
             }
         }
     }

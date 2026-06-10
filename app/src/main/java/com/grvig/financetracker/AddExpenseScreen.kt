@@ -22,7 +22,8 @@ import java.time.LocalTime
 
 @Composable
 fun AddExpenseScreen(
-    expenseViewModel: ExpenseViewModel
+    expenseViewModel: ExpenseViewModel,
+    onViewExpensesClick: () -> Unit
 ) {
 
     var amount by remember { mutableStateOf("") }
@@ -45,6 +46,13 @@ fun AddExpenseScreen(
             text = "Add Expense",
             style = MaterialTheme.typography.headlineMedium
         )
+
+        Button(
+            onClick = onViewExpensesClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("View Expenses")
+        }
 
         OutlinedTextField(
             value = amount,
@@ -111,9 +119,7 @@ fun AddExpenseScreen(
                     isRecurring = false
                 )
 
-                expenseViewModel.insertExpense(
-                    expense
-                )
+                expenseViewModel.insertExpense(expense)
 
                 scope.launch {
                     snackbarHostState.showSnackbar(
