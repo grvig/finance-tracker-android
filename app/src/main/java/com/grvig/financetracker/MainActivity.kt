@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModelProvider
+import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.database.DatabaseProvider
 import com.grvig.financetracker.repository.ExpenseRepository
 import com.grvig.financetracker.ui.theme.FinanceTrackerTheme
@@ -38,6 +39,10 @@ class MainActivity : ComponentActivity() {
 
                 var currentScreen by remember {
                     mutableStateOf(Screen.DASHBOARD)
+                }
+
+                var selectedExpense by remember {
+                    mutableStateOf<Expense?>(null)
                 }
 
                 when (currentScreen) {
@@ -80,8 +85,30 @@ class MainActivity : ComponentActivity() {
                             onDashboardClick = {
                                 currentScreen =
                                     Screen.DASHBOARD
+                            },
+                            onEditExpenseClick = { expense ->
+
+                                selectedExpense = expense
+
+                                currentScreen =
+                                    Screen.EDIT_EXPENSE
                             }
                         )
+                    }
+
+                    Screen.EDIT_EXPENSE -> {
+
+                        selectedExpense?.let { expense ->
+
+                            EditExpenseScreen(
+                                expense = expense,
+                                expenseViewModel = expenseViewModel,
+                                onSaveClick = {
+                                    currentScreen =
+                                        Screen.EXPENSE_LIST
+                                }
+                            )
+                        }
                     }
                 }
             }

@@ -15,13 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun ExpenseListScreen(
     expenseViewModel: ExpenseViewModel,
     onAddExpenseClick: () -> Unit,
-    onDashboardClick: () -> Unit
+    onDashboardClick: () -> Unit,
+    onEditExpenseClick: (Expense) -> Unit
 ) {
 
     var expenses by remember {
@@ -92,12 +94,24 @@ fun ExpenseListScreen(
 
                         Button(
                             onClick = {
+                                onEditExpenseClick(expense)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        ) {
+                            Text("Edit")
+                        }
+
+                        Button(
+                            onClick = {
 
                                 expenseViewModel.deleteExpense(
                                     expense
                                 )
 
                                 scope.launch {
+                                    delay(200)
                                     refreshExpenses()
                                 }
                             },
