@@ -30,10 +30,14 @@ fun ExpenseListScreen(
 
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
+    fun refreshExpenses() {
         scope.launch {
             expenses = expenseViewModel.getAllExpenses()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        refreshExpenses()
     }
 
     Column(
@@ -85,6 +89,24 @@ fun ExpenseListScreen(
                         Text(expense.category)
                         Text(expense.paymentMethod)
                         Text(expense.description)
+
+                        Button(
+                            onClick = {
+
+                                expenseViewModel.deleteExpense(
+                                    expense
+                                )
+
+                                scope.launch {
+                                    refreshExpenses()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        ) {
+                            Text("Delete")
+                        }
                     }
                 }
             }
