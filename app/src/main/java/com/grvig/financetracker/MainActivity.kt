@@ -37,10 +37,23 @@ class MainActivity : ComponentActivity() {
             FinanceTrackerTheme {
 
                 var currentScreen by remember {
-                    mutableStateOf(Screen.ADD_EXPENSE)
+                    mutableStateOf(Screen.DASHBOARD)
                 }
 
                 when (currentScreen) {
+
+                    Screen.DASHBOARD -> {
+                        DashboardScreen(
+                            onAddExpenseClick = {
+                                currentScreen =
+                                    Screen.ADD_EXPENSE
+                            },
+                            onViewExpensesClick = {
+                                currentScreen =
+                                    Screen.EXPENSE_LIST
+                            }
+                        )
+                    }
 
                     Screen.ADD_EXPENSE -> {
                         AddExpenseScreen(
