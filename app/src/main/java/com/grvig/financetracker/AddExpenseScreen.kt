@@ -1,6 +1,5 @@
 package com.grvig.financetracker
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,12 +15,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
+import com.grvig.financetracker.viewmodel.ExpenseViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun AddExpenseScreen() {
+fun AddExpenseScreen(
+    expenseViewModel: ExpenseViewModel
+) {
 
     var amount by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
@@ -109,14 +111,13 @@ fun AddExpenseScreen() {
                     isRecurring = false
                 )
 
-                Log.d(
-                    "FinanceTracker",
-                    expense.toString()
+                expenseViewModel.insertExpense(
+                    expense
                 )
 
                 scope.launch {
                     snackbarHostState.showSnackbar(
-                        "Expense created successfully"
+                        "Expense saved to database"
                     )
                 }
 

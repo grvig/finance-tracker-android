@@ -33,4 +33,8 @@ class ExpenseViewModel(
             repository.deleteExpense(expense)
         }
     }
+
+    suspend fun getAllExpenses(): List<Expense> {
+        return repository.getAllExpenses()
+    }
 }
