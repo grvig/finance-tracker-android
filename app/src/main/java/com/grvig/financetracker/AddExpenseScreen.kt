@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
@@ -28,12 +30,46 @@ fun AddExpenseScreen(
 ) {
 
     var amount by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var paymentMethod by remember { mutableStateOf("") }
+
+    var category by remember {
+        mutableStateOf("Food")
+    }
+
+    var paymentMethod by remember {
+        mutableStateOf("UPI")
+    }
+
     var description by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    var categoryExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    var paymentExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    val categories = listOf(
+        "Food",
+        "Transport",
+        "Shopping",
+        "Bills",
+        "Health",
+        "Entertainment"
+    )
+
+    val paymentMethods = listOf(
+        "Cash",
+        "UPI",
+        "Debit Card",
+        "Credit Card"
+    )
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
     val scope = rememberCoroutineScope()
 
     Column(
@@ -47,6 +83,7 @@ fun AddExpenseScreen(
             text = "Add Expense",
             style = MaterialTheme.typography.headlineMedium
         )
+
         Button(
             onClick = onDashboardClick,
             modifier = Modifier.fillMaxWidth()
@@ -68,19 +105,65 @@ fun AddExpenseScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
-            value = category,
-            onValueChange = { category = it },
-            label = { Text("Category") },
+        Button(
+            onClick = {
+                categoryExpanded = true
+            },
             modifier = Modifier.fillMaxWidth()
-        )
+        ) {
+            Text("Category: $category")
+        }
 
-        OutlinedTextField(
-            value = paymentMethod,
-            onValueChange = { paymentMethod = it },
-            label = { Text("Payment Method") },
+        DropdownMenu(
+            expanded = categoryExpanded,
+            onDismissRequest = {
+                categoryExpanded = false
+            }
+        ) {
+
+            categories.forEach { item ->
+
+                DropdownMenuItem(
+                    text = {
+                        Text(item)
+                    },
+                    onClick = {
+                        category = item
+                        categoryExpanded = false
+                    }
+                )
+            }
+        }
+
+        Button(
+            onClick = {
+                paymentExpanded = true
+            },
             modifier = Modifier.fillMaxWidth()
-        )
+        ) {
+            Text("Payment Method: $paymentMethod")
+        }
+
+        DropdownMenu(
+            expanded = paymentExpanded,
+            onDismissRequest = {
+                paymentExpanded = false
+            }
+        ) {
+
+            paymentMethods.forEach { item ->
+
+                DropdownMenuItem(
+                    text = {
+                        Text(item)
+                    },
+                    onClick = {
+                        paymentMethod = item
+                        paymentExpanded = false
+                    }
+                )
+            }
+        }
 
         OutlinedTextField(
             value = description,
@@ -99,18 +182,17 @@ fun AddExpenseScreen(
         Button(
             onClick = {
 
-                val amountValue = amount.toDoubleOrNull()
+                val amountValue =
+                    amount.toDoubleOrNull()
 
-                if (
-                    amountValue == null ||
-                    category.isBlank() ||
-                    paymentMethod.isBlank()
-                ) {
+                if (amountValue == null) {
+
                     scope.launch {
                         snackbarHostState.showSnackbar(
-                            "Please fill required fields"
+                            "Please enter a valid amount"
                         )
                     }
+
                     return@Button
                 }
 
@@ -126,7 +208,9 @@ fun AddExpenseScreen(
                     isRecurring = false
                 )
 
-                expenseViewModel.insertExpense(expense)
+                expenseViewModel.insertExpense(
+                    expense
+                )
 
                 scope.launch {
                     snackbarHostState.showSnackbar(
@@ -135,8 +219,6 @@ fun AddExpenseScreen(
                 }
 
                 amount = ""
-                category = ""
-                paymentMethod = ""
                 description = ""
                 notes = ""
             },
