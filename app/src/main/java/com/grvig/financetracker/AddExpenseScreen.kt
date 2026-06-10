@@ -23,7 +23,8 @@ import java.time.LocalTime
 @Composable
 fun AddExpenseScreen(
     expenseViewModel: ExpenseViewModel,
-    onViewExpensesClick: () -> Unit
+    onViewExpensesClick: () -> Unit,
+    onDashboardClick: () -> Unit
 ) {
 
     var amount by remember { mutableStateOf("") }
@@ -46,6 +47,12 @@ fun AddExpenseScreen(
             text = "Add Expense",
             style = MaterialTheme.typography.headlineMedium
         )
+        Button(
+            onClick = onDashboardClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Back To Dashboard")
+        }
 
         Button(
             onClick = onViewExpensesClick,

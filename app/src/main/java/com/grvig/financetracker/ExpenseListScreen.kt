@@ -20,7 +20,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ExpenseListScreen(
     expenseViewModel: ExpenseViewModel,
-    onAddExpenseClick: () -> Unit
+    onAddExpenseClick: () -> Unit,
+    onDashboardClick: () -> Unit
 ) {
 
     var expenses by remember {
@@ -44,6 +45,15 @@ fun ExpenseListScreen(
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(16.dp)
         )
+
+        Button(
+            onClick = onDashboardClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Text("Back To Dashboard")
+        }
 
         Button(
             onClick = onAddExpenseClick,

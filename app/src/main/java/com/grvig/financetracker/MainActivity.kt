@@ -61,6 +61,10 @@ class MainActivity : ComponentActivity() {
                             onViewExpensesClick = {
                                 currentScreen =
                                     Screen.EXPENSE_LIST
+                            },
+                            onDashboardClick = {
+                                currentScreen =
+                                    Screen.DASHBOARD
                             }
                         )
                     }
@@ -71,6 +75,10 @@ class MainActivity : ComponentActivity() {
                             onAddExpenseClick = {
                                 currentScreen =
                                     Screen.ADD_EXPENSE
+                            },
+                            onDashboardClick = {
+                                currentScreen =
+                                    Screen.DASHBOARD
                             }
                         )
                     }
