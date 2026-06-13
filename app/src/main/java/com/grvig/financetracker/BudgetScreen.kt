@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Budget
 import com.grvig.financetracker.viewmodel.BudgetViewModel
+import android.util.Log
 
 @Composable
 fun BudgetScreen(
@@ -99,6 +100,10 @@ fun BudgetScreen(
 
                     budgetViewModel.insertBudget(
                         budget
+                    )
+                    Log.d(
+                        "FinanceTracker",
+                        budget.toString()
                     )
 
                     category = ""
