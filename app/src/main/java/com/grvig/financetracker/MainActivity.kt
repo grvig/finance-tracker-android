@@ -11,10 +11,14 @@ import com.grvig.financetracker.repository.ExpenseRepository
 import com.grvig.financetracker.ui.theme.FinanceTrackerTheme
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
 import com.grvig.financetracker.viewmodel.ExpenseViewModelFactory
+import com.grvig.financetracker.repository.BudgetRepository
+import com.grvig.financetracker.viewmodel.BudgetViewModel
+import com.grvig.financetracker.viewmodel.BudgetViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var expenseViewModel: ExpenseViewModel
+    private lateinit var budgetViewModel: BudgetViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +37,18 @@ class MainActivity : ComponentActivity() {
             this,
             factory
         )[ExpenseViewModel::class.java]
+        val budgetRepository = BudgetRepository(
+            database.budgetDao()
+        )
+
+        val budgetFactory = BudgetViewModelFactory(
+            budgetRepository
+        )
+
+        budgetViewModel = ViewModelProvider(
+            this,
+            budgetFactory
+        )[BudgetViewModel::class.java]
 
         setContent {
             FinanceTrackerTheme {
@@ -116,7 +132,9 @@ class MainActivity : ComponentActivity() {
                     }
                     Screen.BUDGET -> {
 
-                        BudgetScreen()
+                        BudgetScreen(
+                            budgetViewModel = budgetViewModel
+                        )
                     }
                 }
             }

@@ -12,9 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.grvig.financetracker.data.Budget
+import com.grvig.financetracker.viewmodel.BudgetViewModel
 
 @Composable
-fun BudgetScreen() {
+fun BudgetScreen(
+    budgetViewModel: BudgetViewModel
+) {
 
     var category by remember {
         mutableStateOf("")
@@ -74,7 +78,34 @@ fun BudgetScreen() {
         )
 
         Button(
-            onClick = {},
+            onClick = {
+
+                val limitValue =
+                    monthlyLimit.toDoubleOrNull()
+
+                val warningValue =
+                    warningPercent.toIntOrNull()
+
+                if (
+                    limitValue != null &&
+                    warningValue != null
+                ) {
+
+                    val budget = Budget(
+                        category = category,
+                        monthlyLimit = limitValue,
+                        warningPercent = warningValue
+                    )
+
+                    budgetViewModel.insertBudget(
+                        budget
+                    )
+
+                    category = ""
+                    monthlyLimit = ""
+                    warningPercent = ""
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Save Budget")
