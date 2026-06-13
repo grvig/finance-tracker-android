@@ -4,5 +4,6 @@ enum class Screen {
     DASHBOARD,
     ADD_EXPENSE,
     EXPENSE_LIST,
-    EDIT_EXPENSE
+    EDIT_EXPENSE,
+    BUDGET
 }

@@ -57,6 +57,10 @@ class MainActivity : ComponentActivity() {
                             onViewExpensesClick = {
                                 currentScreen =
                                     Screen.EXPENSE_LIST
+                            },
+                            onBudgetClick = {
+                                currentScreen =
+                                    Screen.BUDGET
                             }
                         )
                     }
@@ -109,6 +113,10 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+                    }
+                    Screen.BUDGET -> {
+
+                        BudgetScreen()
                     }
                 }
             }

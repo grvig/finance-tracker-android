@@ -21,7 +21,8 @@ import java.time.LocalDate
 fun DashboardScreen(
     expenseViewModel: ExpenseViewModel,
     onAddExpenseClick: () -> Unit,
-    onViewExpensesClick: () -> Unit
+    onViewExpensesClick: () -> Unit,
+    onBudgetClick: () -> Unit
 ) {
 
     var expenses by remember {
@@ -109,6 +110,12 @@ fun DashboardScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("View Expenses")
+        }
+        Button(
+            onClick = onBudgetClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Budget Tracking")
         }
     }
 }
