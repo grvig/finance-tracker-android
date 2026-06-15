@@ -40,6 +40,9 @@ fun BudgetScreen(
     var budgets by remember {
         mutableStateOf<List<Budget>>(emptyList())
     }
+    var editingBudget by remember {
+        mutableStateOf<Budget?>(null)
+    }
 
     val scope = rememberCoroutineScope()
 
@@ -112,15 +115,34 @@ fun BudgetScreen(
                     warningValue != null
                 ) {
 
-                    val budget = Budget(
-                        category = category,
-                        monthlyLimit = limitValue,
-                        warningPercent = warningValue
-                    )
+                    val budget = if (
+                        editingBudget != null
+                    ) {
+                        editingBudget!!.copy(
+                            category = category,
+                            monthlyLimit = limitValue,
+                            warningPercent = warningValue
+                        )
+                    } else {
+                        Budget(
+                            category = category,
+                            monthlyLimit = limitValue,
+                            warningPercent = warningValue
+                        )
+                    }
 
-                    budgetViewModel.insertBudget(
-                        budget
-                    )
+                    if (editingBudget != null) {
+
+                        budgetViewModel.updateBudget(
+                            budget
+                        )
+
+                    } else {
+
+                        budgetViewModel.insertBudget(
+                            budget
+                        )
+                    }
                     scope.launch {
                         refreshBudgets()
                     }
@@ -132,11 +154,17 @@ fun BudgetScreen(
                     category = ""
                     monthlyLimit = ""
                     warningPercent = ""
+                    editingBudget = null
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Save Budget")
+            Text(
+                if (editingBudget != null)
+                    "Update Budget"
+                else
+                    "Save Budget"
+            )
         }
 
         Text(
@@ -169,6 +197,24 @@ fun BudgetScreen(
                         Text(
                             text = "${budget.warningPercent}% Warning"
                         )
+                        Button(
+                            onClick = {
+
+                                category = budget.category
+
+                                monthlyLimit =
+                                    budget.monthlyLimit.toString()
+
+                                warningPercent =
+                                    budget.warningPercent.toString()
+                                editingBudget = budget
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        ) {
+                            Text("Load Into Form")
+                        }
                         Button(
                             onClick = {
 

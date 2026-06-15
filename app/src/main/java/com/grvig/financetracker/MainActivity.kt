@@ -14,6 +14,8 @@ import com.grvig.financetracker.viewmodel.ExpenseViewModelFactory
 import com.grvig.financetracker.repository.BudgetRepository
 import com.grvig.financetracker.viewmodel.BudgetViewModel
 import com.grvig.financetracker.viewmodel.BudgetViewModelFactory
+import com.grvig.financetracker.data.Budget
+import androidx.compose.material3.Text
 
 class MainActivity : ComponentActivity() {
 
@@ -59,6 +61,9 @@ class MainActivity : ComponentActivity() {
 
                 var selectedExpense by remember {
                     mutableStateOf<Expense?>(null)
+                }
+                var selectedBudget by remember {
+                    mutableStateOf<Budget?>(null)
                 }
 
                 when (currentScreen) {
@@ -136,6 +141,20 @@ class MainActivity : ComponentActivity() {
                         BudgetScreen(
                             budgetViewModel = budgetViewModel
                         )
+                    }
+                    Screen.EDIT_BUDGET -> {
+
+                        selectedBudget?.let { budget ->
+
+                            EditBudgetScreen(
+                                budget = budget,
+                                budgetViewModel = budgetViewModel,
+                                onSaveClick = {
+                                    currentScreen =
+                                        Screen.BUDGET
+                                }
+                            )
+                        }
                     }
                 }
             }
