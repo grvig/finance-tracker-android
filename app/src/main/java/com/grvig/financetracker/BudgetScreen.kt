@@ -136,12 +136,20 @@ fun BudgetScreen(
                         budgetViewModel.updateBudget(
                             budget
                         )
+                        scope.launch {
+                            kotlinx.coroutines.delay(200)
+                            refreshBudgets()
+                        }
 
                     } else {
 
                         budgetViewModel.insertBudget(
                             budget
                         )
+                        scope.launch {
+                            kotlinx.coroutines.delay(200)
+                            refreshBudgets()
+                        }
                     }
                     scope.launch {
                         refreshBudgets()
