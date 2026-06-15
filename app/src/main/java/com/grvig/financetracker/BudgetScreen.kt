@@ -15,6 +15,10 @@ import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Budget
 import com.grvig.financetracker.viewmodel.BudgetViewModel
 import android.util.Log
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import kotlinx.coroutines.launch
 
 @Composable
 fun BudgetScreen(
@@ -31,6 +35,22 @@ fun BudgetScreen(
 
     var warningPercent by remember {
         mutableStateOf("")
+    }
+
+    var budgets by remember {
+        mutableStateOf<List<Budget>>(emptyList())
+    }
+
+    val scope = rememberCoroutineScope()
+
+    fun refreshBudgets() {
+        scope.launch {
+            budgets = budgetViewModel.getAllBudgets()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        refreshBudgets()
     }
 
     Column(
@@ -101,6 +121,9 @@ fun BudgetScreen(
                     budgetViewModel.insertBudget(
                         budget
                     )
+                    scope.launch {
+                        refreshBudgets()
+                    }
                     Log.d(
                         "FinanceTracker",
                         budget.toString()
@@ -114,6 +137,41 @@ fun BudgetScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Save Budget")
+        }
+
+        Text(
+            text = "Saved Budgets",
+            style = MaterialTheme.typography.headlineSmall
+        )
+
+        LazyColumn {
+
+            items(budgets) { budget ->
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+
+                    Column(
+                        modifier = Modifier.padding(12.dp)
+                    ) {
+
+                        Text(
+                            text = budget.category
+                        )
+
+                        Text(
+                            text = "₹${budget.monthlyLimit}"
+                        )
+
+                        Text(
+                            text = "${budget.warningPercent}% Warning"
+                        )
+                    }
+                }
+            }
         }
     }
 }
