@@ -66,6 +66,7 @@ class MainActivity : ComponentActivity() {
                     Screen.DASHBOARD -> {
                         DashboardScreen(
                             expenseViewModel = expenseViewModel,
+                            budgetViewModel = budgetViewModel,
                             onAddExpenseClick = {
                                 currentScreen =
                                     Screen.ADD_EXPENSE

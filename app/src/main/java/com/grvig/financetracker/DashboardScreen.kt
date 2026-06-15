@@ -16,17 +16,23 @@ import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import com.grvig.financetracker.data.Budget
+import com.grvig.financetracker.viewmodel.BudgetViewModel
 
 @Composable
 fun DashboardScreen(
-    expenseViewModel: ExpenseViewModel,
-    onAddExpenseClick: () -> Unit,
-    onViewExpensesClick: () -> Unit,
-    onBudgetClick: () -> Unit
+expenseViewModel: ExpenseViewModel,
+budgetViewModel: BudgetViewModel,
+onAddExpenseClick: () -> Unit,
+onViewExpensesClick: () -> Unit,
+onBudgetClick: () -> Unit
 ) {
 
     var expenses by remember {
         mutableStateOf<List<Expense>>(emptyList())
+    }
+    var budgets by remember {
+        mutableStateOf<List<Budget>>(emptyList())
     }
 
     val scope = rememberCoroutineScope()
@@ -34,6 +40,7 @@ fun DashboardScreen(
     LaunchedEffect(Unit) {
         scope.launch {
             expenses = expenseViewModel.getAllExpenses()
+            budgets = budgetViewModel.getAllBudgets()
         }
     }
 
@@ -63,6 +70,12 @@ fun DashboardScreen(
         .sumOf {
             it.amount
         }
+    val totalBudget = budgets.sumOf {
+        it.monthlyLimit
+    }
+
+    val remainingBudget =
+        totalBudget - monthSpent
 
     Column(
         modifier = Modifier
@@ -95,6 +108,22 @@ fun DashboardScreen(
             ) {
                 Text("Today's Spending: ₹$todaySpent")
                 Text("This Month's Spending: ₹$monthSpent")
+            }
+        }
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+
+                Text(
+                    "Total Budget: ₹$totalBudget"
+                )
+
+                Text(
+                    "Remaining Budget: ₹$remainingBudget"
+                )
             }
         }
 
