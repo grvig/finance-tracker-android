@@ -169,6 +169,23 @@ fun BudgetScreen(
                         Text(
                             text = "${budget.warningPercent}% Warning"
                         )
+                        Button(
+                            onClick = {
+
+                                budgetViewModel.deleteBudget(
+                                    budget
+                                )
+
+                                scope.launch {
+                                    refreshBudgets()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        ) {
+                            Text("Delete")
+                        }
                     }
                 }
             }
