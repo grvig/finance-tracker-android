@@ -151,9 +151,6 @@ fun BudgetScreen(
                             refreshBudgets()
                         }
                     }
-                    scope.launch {
-                        refreshBudgets()
-                    }
                     Log.d(
                         "FinanceTracker",
                         budget.toString()
