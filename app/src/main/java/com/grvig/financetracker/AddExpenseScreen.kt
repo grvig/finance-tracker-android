@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
@@ -22,6 +25,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(
     expenseViewModel: ExpenseViewModel,
@@ -105,63 +109,95 @@ fun AddExpenseScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Button(
-            onClick = {
-                categoryExpanded = true
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Category: $category")
-        }
-
-        DropdownMenu(
+        ExposedDropdownMenuBox(
             expanded = categoryExpanded,
-            onDismissRequest = {
-                categoryExpanded = false
+            onExpandedChange = {
+                categoryExpanded = it
             }
         ) {
 
-            categories.forEach { item ->
+            OutlinedTextField(
+                value = category,
+                onValueChange = {},
+                readOnly = true,
+                label = {
+                    Text("Category")
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = categoryExpanded
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
 
-                DropdownMenuItem(
-                    text = {
-                        Text(item)
-                    },
-                    onClick = {
-                        category = item
-                        categoryExpanded = false
-                    }
-                )
+            DropdownMenu(
+                expanded = categoryExpanded,
+                onDismissRequest = {
+                    categoryExpanded = false
+                }
+            ) {
+
+                categories.forEach { item ->
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(item)
+                        },
+                        onClick = {
+                            category = item
+                            categoryExpanded = false
+                        }
+                    )
+                }
             }
         }
 
-        Button(
-            onClick = {
-                paymentExpanded = true
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Payment Method: $paymentMethod")
-        }
-
-        DropdownMenu(
+        ExposedDropdownMenuBox(
             expanded = paymentExpanded,
-            onDismissRequest = {
-                paymentExpanded = false
+            onExpandedChange = {
+                paymentExpanded = it
             }
         ) {
 
-            paymentMethods.forEach { item ->
+            OutlinedTextField(
+                value = paymentMethod,
+                onValueChange = {},
+                readOnly = true,
+                label = {
+                    Text("Payment Method")
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = paymentExpanded
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
 
-                DropdownMenuItem(
-                    text = {
-                        Text(item)
-                    },
-                    onClick = {
-                        paymentMethod = item
-                        paymentExpanded = false
-                    }
-                )
+            DropdownMenu(
+                expanded = paymentExpanded,
+                onDismissRequest = {
+                    paymentExpanded = false
+                }
+            ) {
+
+                paymentMethods.forEach { item ->
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(item)
+                        },
+                        onClick = {
+                            paymentMethod = item
+                            paymentExpanded = false
+                        }
+                    )
+                }
             }
         }
 
