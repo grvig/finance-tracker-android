@@ -8,6 +8,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -30,6 +32,24 @@ fun ExpenseListScreen(
         mutableStateOf<List<Expense>>(emptyList())
     }
 
+    var selectedCategory by remember {
+        mutableStateOf("All")
+    }
+
+    var categoryExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    val categories = listOf(
+        "All",
+        "Food",
+        "Transport",
+        "Shopping",
+        "Bills",
+        "Health",
+        "Entertainment"
+    )
+
     val scope = rememberCoroutineScope()
 
     fun refreshExpenses() {
@@ -40,6 +60,14 @@ fun ExpenseListScreen(
 
     LaunchedEffect(Unit) {
         refreshExpenses()
+    }
+
+    val filteredExpenses = if (selectedCategory == "All") {
+        expenses
+    } else {
+        expenses.filter {
+            it.category == selectedCategory
+        }
     }
 
     Column(
@@ -70,9 +98,41 @@ fun ExpenseListScreen(
             Text("Add New Expense")
         }
 
+        Button(
+            onClick = {
+                categoryExpanded = true
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Text("Category: $selectedCategory")
+        }
+
+        DropdownMenu(
+            expanded = categoryExpanded,
+            onDismissRequest = {
+                categoryExpanded = false
+            }
+        ) {
+
+            categories.forEach { item ->
+
+                DropdownMenuItem(
+                    text = {
+                        Text(item)
+                    },
+                    onClick = {
+                        selectedCategory = item
+                        categoryExpanded = false
+                    }
+                )
+            }
+        }
+
         LazyColumn {
 
-            items(expenses) { expense ->
+            items(filteredExpenses) { expense ->
 
                 Card(
                     modifier = Modifier
