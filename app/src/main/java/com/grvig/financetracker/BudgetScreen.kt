@@ -222,6 +222,14 @@ fun BudgetScreen(
                         modifier = Modifier.padding(12.dp)
                     ) {
 
+                        val spent = spentForCategory(budget.category)
+
+                        val spentPercent = if (budget.monthlyLimit > 0) {
+                            ((spent / budget.monthlyLimit) * 100).toInt()
+                        } else {
+                            0
+                        }
+
                         Text(
                             text = budget.category
                         )
@@ -231,8 +239,14 @@ fun BudgetScreen(
                         )
 
                         Text(
-                            text = "${budget.warningPercent}% Warning"
+                            text = "Spent: ₹$spent"
                         )
+
+                        if (spentPercent >= budget.warningPercent) {
+                            Text(
+                                text = "⚠ $spentPercent% of budget used"
+                            )
+                        }
                         Button(
                             onClick = {
 
