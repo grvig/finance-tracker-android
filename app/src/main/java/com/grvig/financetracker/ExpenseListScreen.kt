@@ -10,7 +10,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,6 +24,7 @@ import com.grvig.financetracker.viewmodel.ExpenseViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpenseListScreen(
     expenseViewModel: ExpenseViewModel,
@@ -128,67 +133,97 @@ fun ExpenseListScreen(
             Text("Add New Expense")
         }
 
-        Button(
-            onClick = {
-                categoryExpanded = true
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text("Category: $selectedCategory")
-        }
-
-        DropdownMenu(
+        ExposedDropdownMenuBox(
             expanded = categoryExpanded,
-            onDismissRequest = {
-                categoryExpanded = false
-            }
-        ) {
-
-            categories.forEach { item ->
-
-                DropdownMenuItem(
-                    text = {
-                        Text(item)
-                    },
-                    onClick = {
-                        selectedCategory = item
-                        categoryExpanded = false
-                    }
-                )
-            }
-        }
-
-        Button(
-            onClick = {
-                sortExpanded = true
+            onExpandedChange = {
+                categoryExpanded = it
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
-            Text("Sort: $selectedSort")
+
+            OutlinedTextField(
+                value = selectedCategory,
+                onValueChange = {},
+                readOnly = true,
+                label = {
+                    Text("Category")
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = categoryExpanded
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
+
+            DropdownMenu(
+                expanded = categoryExpanded,
+                onDismissRequest = {
+                    categoryExpanded = false
+                }
+            ) {
+
+                categories.forEach { item ->
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(item)
+                        },
+                        onClick = {
+                            selectedCategory = item
+                            categoryExpanded = false
+                        }
+                    )
+                }
+            }
         }
 
-        DropdownMenu(
+        ExposedDropdownMenuBox(
             expanded = sortExpanded,
-            onDismissRequest = {
-                sortExpanded = false
-            }
+            onExpandedChange = {
+                sortExpanded = it
+            },
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
 
-            sortOptions.forEach { item ->
+            OutlinedTextField(
+                value = selectedSort,
+                onValueChange = {},
+                readOnly = true,
+                label = {
+                    Text("Sort")
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = sortExpanded
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
 
-                DropdownMenuItem(
-                    text = {
-                        Text(item)
-                    },
-                    onClick = {
-                        selectedSort = item
-                        sortExpanded = false
-                    }
-                )
+            DropdownMenu(
+                expanded = sortExpanded,
+                onDismissRequest = {
+                    sortExpanded = false
+                }
+            ) {
+
+                sortOptions.forEach { item ->
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(item)
+                        },
+                        onClick = {
+                            selectedSort = item
+                            sortExpanded = false
+                        }
+                    )
+                }
             }
         }
 
