@@ -50,6 +50,21 @@ fun ExpenseListScreen(
         "Entertainment"
     )
 
+    var selectedSort by remember {
+        mutableStateOf("Newest")
+    }
+
+    var sortExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    val sortOptions = listOf(
+        "Newest",
+        "Oldest",
+        "Highest Amount",
+        "Lowest Amount"
+    )
+
     val scope = rememberCoroutineScope()
 
     fun refreshExpenses() {
@@ -67,6 +82,21 @@ fun ExpenseListScreen(
     } else {
         expenses.filter {
             it.category == selectedCategory
+        }
+    }
+
+    val sortedExpenses = when (selectedSort) {
+        "Oldest" -> filteredExpenses.sortedBy {
+            it.date + it.time
+        }
+        "Highest Amount" -> filteredExpenses.sortedByDescending {
+            it.amount
+        }
+        "Lowest Amount" -> filteredExpenses.sortedBy {
+            it.amount
+        }
+        else -> filteredExpenses.sortedByDescending {
+            it.date + it.time
         }
     }
 
@@ -130,9 +160,41 @@ fun ExpenseListScreen(
             }
         }
 
+        Button(
+            onClick = {
+                sortExpanded = true
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Text("Sort: $selectedSort")
+        }
+
+        DropdownMenu(
+            expanded = sortExpanded,
+            onDismissRequest = {
+                sortExpanded = false
+            }
+        ) {
+
+            sortOptions.forEach { item ->
+
+                DropdownMenuItem(
+                    text = {
+                        Text(item)
+                    },
+                    onClick = {
+                        selectedSort = item
+                        sortExpanded = false
+                    }
+                )
+            }
+        }
+
         LazyColumn {
 
-            items(filteredExpenses) { expense ->
+            items(sortedExpenses) { expense ->
 
                 Card(
                     modifier = Modifier
