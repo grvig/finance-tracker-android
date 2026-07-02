@@ -13,16 +13,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Budget
+import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.BudgetViewModel
+import com.grvig.financetracker.viewmodel.ExpenseViewModel
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @Composable
 fun BudgetScreen(
-    budgetViewModel: BudgetViewModel
+    budgetViewModel: BudgetViewModel,
+    expenseViewModel: ExpenseViewModel
 ) {
 
     var category by remember {
@@ -40,6 +44,9 @@ fun BudgetScreen(
     var budgets by remember {
         mutableStateOf<List<Budget>>(emptyList())
     }
+    var expenses by remember {
+        mutableStateOf<List<Expense>>(emptyList())
+    }
     var editingBudget by remember {
         mutableStateOf<Budget?>(null)
     }
@@ -52,8 +59,32 @@ fun BudgetScreen(
         }
     }
 
+    fun refreshExpenses() {
+        scope.launch {
+            expenses = expenseViewModel.getAllExpenses()
+        }
+    }
+
     LaunchedEffect(Unit) {
         refreshBudgets()
+        refreshExpenses()
+    }
+
+    val currentMonth =
+        LocalDate.now().toString().substring(0, 7)
+
+    val monthExpenses = expenses.filter {
+        it.date.startsWith(currentMonth)
+    }
+
+    fun spentForCategory(category: String): Double {
+        return monthExpenses
+            .filter {
+                it.category == category
+            }
+            .sumOf {
+                it.amount
+            }
     }
 
     Column(

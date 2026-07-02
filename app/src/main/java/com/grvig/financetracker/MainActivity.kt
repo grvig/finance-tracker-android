@@ -135,7 +135,8 @@ class MainActivity : ComponentActivity() {
                     Screen.BUDGET -> {
 
                         BudgetScreen(
-                            budgetViewModel = budgetViewModel
+                            budgetViewModel = budgetViewModel,
+                            expenseViewModel = expenseViewModel
                         )
                     }
                 }
