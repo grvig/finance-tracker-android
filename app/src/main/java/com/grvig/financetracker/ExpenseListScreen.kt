@@ -37,6 +37,10 @@ fun ExpenseListScreen(
         mutableStateOf<List<Expense>>(emptyList())
     }
 
+    var searchQuery by remember {
+        mutableStateOf("")
+    }
+
     var selectedCategory by remember {
         mutableStateOf("All")
     }
@@ -82,10 +86,19 @@ fun ExpenseListScreen(
         refreshExpenses()
     }
 
-    val filteredExpenses = if (selectedCategory == "All") {
+    val searchedExpenses = if (searchQuery.isBlank()) {
         expenses
     } else {
         expenses.filter {
+            it.description.contains(searchQuery, ignoreCase = true) ||
+                it.notes.contains(searchQuery, ignoreCase = true)
+        }
+    }
+
+    val filteredExpenses = if (selectedCategory == "All") {
+        searchedExpenses
+    } else {
+        searchedExpenses.filter {
             it.category == selectedCategory
         }
     }
@@ -132,6 +145,19 @@ fun ExpenseListScreen(
         ) {
             Text("Add New Expense")
         }
+
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = {
+                searchQuery = it
+            },
+            label = {
+                Text("Search")
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        )
 
         ExposedDropdownMenuBox(
             expanded = categoryExpanded,
