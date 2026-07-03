@@ -6,6 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -15,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditExpenseScreen(
     expense: Expense,
@@ -42,6 +48,30 @@ fun EditExpenseScreen(
         mutableStateOf(expense.notes)
     }
 
+    var categoryExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    var paymentExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    val categories = listOf(
+        "Food",
+        "Transport",
+        "Shopping",
+        "Bills",
+        "Health",
+        "Entertainment"
+    )
+
+    val paymentMethods = listOf(
+        "Cash",
+        "UPI",
+        "Debit Card",
+        "Credit Card"
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,27 +95,97 @@ fun EditExpenseScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
-            value = category,
-            onValueChange = {
-                category = it
-            },
-            label = {
-                Text("Category")
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
+        ExposedDropdownMenuBox(
+            expanded = categoryExpanded,
+            onExpandedChange = {
+                categoryExpanded = it
+            }
+        ) {
 
-        OutlinedTextField(
-            value = paymentMethod,
-            onValueChange = {
-                paymentMethod = it
-            },
-            label = {
-                Text("Payment Method")
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
+            OutlinedTextField(
+                value = category,
+                onValueChange = {},
+                readOnly = true,
+                label = {
+                    Text("Category")
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = categoryExpanded
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
+
+            DropdownMenu(
+                expanded = categoryExpanded,
+                onDismissRequest = {
+                    categoryExpanded = false
+                }
+            ) {
+
+                categories.forEach { item ->
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(item)
+                        },
+                        onClick = {
+                            category = item
+                            categoryExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+
+        ExposedDropdownMenuBox(
+            expanded = paymentExpanded,
+            onExpandedChange = {
+                paymentExpanded = it
+            }
+        ) {
+
+            OutlinedTextField(
+                value = paymentMethod,
+                onValueChange = {},
+                readOnly = true,
+                label = {
+                    Text("Payment Method")
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = paymentExpanded
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
+
+            DropdownMenu(
+                expanded = paymentExpanded,
+                onDismissRequest = {
+                    paymentExpanded = false
+                }
+            ) {
+
+                paymentMethods.forEach { item ->
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(item)
+                        },
+                        onClick = {
+                            paymentMethod = item
+                            paymentExpanded = false
+                        }
+                    )
+                }
+            }
+        }
 
         OutlinedTextField(
             value = description,
