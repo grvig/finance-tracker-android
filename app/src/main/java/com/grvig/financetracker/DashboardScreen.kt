@@ -99,6 +99,12 @@ onRecurringExpensesClick: () -> Unit
         0.0
     }
 
+    val budgetUsagePercent = if (totalBudget > 0) {
+        ((monthSpent / totalBudget) * 100).toInt()
+    } else {
+        0
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -150,6 +156,10 @@ onRecurringExpensesClick: () -> Unit
 
                 Text(
                     "Largest Category: $largestCategory"
+                )
+
+                Text(
+                    "Budget Usage: $budgetUsagePercent%"
                 )
             }
         }
