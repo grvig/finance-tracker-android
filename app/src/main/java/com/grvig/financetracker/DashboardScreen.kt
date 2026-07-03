@@ -93,6 +93,12 @@ onRecurringExpensesClick: () -> Unit
         ?.key
         ?: "None"
 
+    val averageExpense = if (totalExpenses > 0) {
+        totalSpent / totalExpenses
+    } else {
+        0.0
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -113,6 +119,7 @@ onRecurringExpensesClick: () -> Unit
             ) {
                 Text("Total Expenses: $totalExpenses")
                 Text("Total Spent: ₹$totalSpent")
+                Text("Average Expense: ₹$averageExpense")
             }
         }
 
