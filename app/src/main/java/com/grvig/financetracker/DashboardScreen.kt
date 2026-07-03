@@ -78,6 +78,21 @@ onRecurringExpensesClick: () -> Unit
     val remainingBudget =
         totalBudget - monthSpent
 
+    val largestCategory = expenses
+        .groupBy {
+            it.category
+        }
+        .mapValues { entry ->
+            entry.value.sumOf {
+                it.amount
+            }
+        }
+        .maxByOrNull {
+            it.value
+        }
+        ?.key
+        ?: "None"
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -124,6 +139,10 @@ onRecurringExpensesClick: () -> Unit
 
                 Text(
                     "Remaining Budget: ₹$remainingBudget"
+                )
+
+                Text(
+                    "Largest Category: $largestCategory"
                 )
             }
         }
