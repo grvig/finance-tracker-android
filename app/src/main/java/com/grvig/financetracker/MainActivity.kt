@@ -14,12 +14,16 @@ import com.grvig.financetracker.viewmodel.ExpenseViewModelFactory
 import com.grvig.financetracker.repository.BudgetRepository
 import com.grvig.financetracker.viewmodel.BudgetViewModel
 import com.grvig.financetracker.viewmodel.BudgetViewModelFactory
+import com.grvig.financetracker.repository.RecurringExpenseRepository
+import com.grvig.financetracker.viewmodel.RecurringExpenseViewModel
+import com.grvig.financetracker.viewmodel.RecurringExpenseViewModelFactory
 import androidx.compose.material3.Text
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var expenseViewModel: ExpenseViewModel
     private lateinit var budgetViewModel: BudgetViewModel
+    private lateinit var recurringExpenseViewModel: RecurringExpenseViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +55,19 @@ class MainActivity : ComponentActivity() {
             budgetFactory
         )[BudgetViewModel::class.java]
 
+        val recurringExpenseRepository = RecurringExpenseRepository(
+            database.recurringExpenseDao()
+        )
+
+        val recurringExpenseFactory = RecurringExpenseViewModelFactory(
+            recurringExpenseRepository
+        )
+
+        recurringExpenseViewModel = ViewModelProvider(
+            this,
+            recurringExpenseFactory
+        )[RecurringExpenseViewModel::class.java]
+
         setContent {
             FinanceTrackerTheme {
 
@@ -79,6 +96,10 @@ class MainActivity : ComponentActivity() {
                             onBudgetClick = {
                                 currentScreen =
                                     Screen.BUDGET
+                            },
+                            onRecurringExpensesClick = {
+                                currentScreen =
+                                    Screen.RECURRING_EXPENSES
                             }
                         )
                     }
@@ -137,6 +158,17 @@ class MainActivity : ComponentActivity() {
                         BudgetScreen(
                             budgetViewModel = budgetViewModel,
                             expenseViewModel = expenseViewModel
+                        )
+                    }
+
+                    Screen.RECURRING_EXPENSES -> {
+
+                        RecurringExpensesScreen(
+                            recurringExpenseViewModel = recurringExpenseViewModel,
+                            onDashboardClick = {
+                                currentScreen =
+                                    Screen.DASHBOARD
+                            }
                         )
                     }
                 }
