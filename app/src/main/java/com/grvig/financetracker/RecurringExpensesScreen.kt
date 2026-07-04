@@ -366,6 +366,9 @@ fun RecurringExpensesScreen(
                         Text(
                             "${recurringExpense.frequency}, next due ${recurringExpense.nextDueDate}"
                         )
+                        Text(
+                            if (recurringExpense.isActive) "Active" else "Paused"
+                        )
 
                         Button(
                             onClick = {
@@ -382,6 +385,29 @@ fun RecurringExpensesScreen(
                                 .padding(top = 8.dp)
                         ) {
                             Text("Load Into Form")
+                        }
+
+                        Button(
+                            onClick = {
+
+                                recurringExpenseViewModel.updateRecurringExpense(
+                                    recurringExpense.copy(
+                                        isActive = !recurringExpense.isActive
+                                    )
+                                )
+
+                                scope.launch {
+                                    kotlinx.coroutines.delay(200)
+                                    refreshRecurringExpenses()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        ) {
+                            Text(
+                                if (recurringExpense.isActive) "Pause" else "Resume"
+                            )
                         }
 
                         Button(
