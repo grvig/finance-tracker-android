@@ -143,7 +143,8 @@ fun BudgetScreen(
 
                 if (
                     limitValue != null &&
-                    warningValue != null
+                    warningValue != null &&
+                    category.isNotBlank()
                 ) {
 
                     val budget = if (
