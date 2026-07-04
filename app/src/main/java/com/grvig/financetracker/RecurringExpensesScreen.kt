@@ -24,6 +24,7 @@ import com.grvig.financetracker.data.RecurringExpense
 import com.grvig.financetracker.viewmodel.RecurringExpenseViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -366,6 +367,20 @@ fun RecurringExpensesScreen(
                         Text(
                             "${recurringExpense.frequency}, next due ${recurringExpense.nextDueDate}"
                         )
+
+                        val daysUntilDue = ChronoUnit.DAYS.between(
+                            LocalDate.now(),
+                            LocalDate.parse(recurringExpense.nextDueDate)
+                        )
+
+                        Text(
+                            when {
+                                daysUntilDue < 0 -> "Overdue by ${-daysUntilDue} days"
+                                daysUntilDue == 0L -> "Due today"
+                                else -> "Due in $daysUntilDue days"
+                            }
+                        )
+
                         Text(
                             if (recurringExpense.isActive) "Active" else "Paused"
                         )
