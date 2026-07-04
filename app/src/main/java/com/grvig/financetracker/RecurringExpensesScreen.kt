@@ -84,6 +84,10 @@ fun RecurringExpensesScreen(
         mutableStateOf<List<RecurringExpense>>(emptyList())
     }
 
+    var editingRecurringExpense by remember {
+        mutableStateOf<RecurringExpense?>(null)
+    }
+
     val scope = rememberCoroutineScope()
 
     fun refreshRecurringExpenses() {
@@ -283,21 +287,39 @@ fun RecurringExpensesScreen(
 
                 if (amountValue != null && title.isNotBlank()) {
 
-                    val recurringExpense = RecurringExpense(
-                        title = title,
-                        amount = amountValue,
-                        category = category,
-                        paymentMethod = paymentMethod,
-                        cardName = null,
-                        notes = "",
-                        frequency = frequency,
-                        nextDueDate = LocalDate.now().toString(),
-                        isActive = true
-                    )
+                    val recurringExpense = if (
+                        editingRecurringExpense != null
+                    ) {
+                        editingRecurringExpense!!.copy(
+                            title = title,
+                            amount = amountValue,
+                            category = category,
+                            paymentMethod = paymentMethod,
+                            frequency = frequency
+                        )
+                    } else {
+                        RecurringExpense(
+                            title = title,
+                            amount = amountValue,
+                            category = category,
+                            paymentMethod = paymentMethod,
+                            cardName = null,
+                            notes = "",
+                            frequency = frequency,
+                            nextDueDate = LocalDate.now().toString(),
+                            isActive = true
+                        )
+                    }
 
-                    recurringExpenseViewModel.insertRecurringExpense(
-                        recurringExpense
-                    )
+                    if (editingRecurringExpense != null) {
+                        recurringExpenseViewModel.updateRecurringExpense(
+                            recurringExpense
+                        )
+                    } else {
+                        recurringExpenseViewModel.insertRecurringExpense(
+                            recurringExpense
+                        )
+                    }
 
                     scope.launch {
                         kotlinx.coroutines.delay(200)
@@ -306,11 +328,17 @@ fun RecurringExpensesScreen(
 
                     title = ""
                     amount = ""
+                    editingRecurringExpense = null
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Save Recurring Expense")
+            Text(
+                if (editingRecurringExpense != null)
+                    "Update Recurring Expense"
+                else
+                    "Save Recurring Expense"
+            )
         }
 
         Text(
@@ -338,6 +366,23 @@ fun RecurringExpensesScreen(
                         Text(
                             "${recurringExpense.frequency}, next due ${recurringExpense.nextDueDate}"
                         )
+
+                        Button(
+                            onClick = {
+
+                                title = recurringExpense.title
+                                amount = recurringExpense.amount.toString()
+                                category = recurringExpense.category
+                                paymentMethod = recurringExpense.paymentMethod
+                                frequency = recurringExpense.frequency
+                                editingRecurringExpense = recurringExpense
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        ) {
+                            Text("Load Into Form")
+                        }
 
                         Button(
                             onClick = {
