@@ -16,6 +16,8 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -87,6 +89,10 @@ fun RecurringExpensesScreen(
 
     var editingRecurringExpense by remember {
         mutableStateOf<RecurringExpense?>(null)
+    }
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
     }
 
     val scope = rememberCoroutineScope()
@@ -330,6 +336,13 @@ fun RecurringExpensesScreen(
                     title = ""
                     amount = ""
                     editingRecurringExpense = null
+                } else {
+
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            "Please enter a title and a valid amount"
+                        )
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -446,5 +459,9 @@ fun RecurringExpensesScreen(
                 }
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState
+        )
     }
 }
