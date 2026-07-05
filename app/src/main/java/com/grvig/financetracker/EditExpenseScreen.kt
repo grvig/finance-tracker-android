@@ -13,12 +13,15 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +74,12 @@ fun EditExpenseScreen(
         "Debit Card",
         "Credit Card"
     )
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -212,24 +221,40 @@ fun EditExpenseScreen(
         Button(
             onClick = {
 
-                val updatedExpense =
-                    expense.copy(
-                        amount = amount.toDoubleOrNull() ?: expense.amount,
-                        category = category,
-                        paymentMethod = paymentMethod,
-                        description = description,
-                        notes = notes
+                val amountValue = amount.toDoubleOrNull()
+
+                if (amountValue != null) {
+
+                    val updatedExpense =
+                        expense.copy(
+                            amount = amountValue,
+                            category = category,
+                            paymentMethod = paymentMethod,
+                            description = description,
+                            notes = notes
+                        )
+
+                    expenseViewModel.updateExpense(
+                        updatedExpense
                     )
 
-                expenseViewModel.updateExpense(
-                    updatedExpense
-                )
+                    onSaveClick()
+                } else {
 
-                onSaveClick()
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            "Please enter a valid amount"
+                        )
+                    }
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Save Changes")
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState
+        )
     }
 }
