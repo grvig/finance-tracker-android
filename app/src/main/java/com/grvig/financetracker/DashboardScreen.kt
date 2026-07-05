@@ -18,11 +18,14 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import com.grvig.financetracker.data.Budget
 import com.grvig.financetracker.viewmodel.BudgetViewModel
+import com.grvig.financetracker.data.RecurringExpense
+import com.grvig.financetracker.viewmodel.RecurringExpenseViewModel
 
 @Composable
 fun DashboardScreen(
 expenseViewModel: ExpenseViewModel,
 budgetViewModel: BudgetViewModel,
+recurringExpenseViewModel: RecurringExpenseViewModel,
 onAddExpenseClick: () -> Unit,
 onViewExpensesClick: () -> Unit,
 onBudgetClick: () -> Unit,
@@ -35,6 +38,9 @@ onRecurringExpensesClick: () -> Unit
     var budgets by remember {
         mutableStateOf<List<Budget>>(emptyList())
     }
+    var recurringExpenses by remember {
+        mutableStateOf<List<RecurringExpense>>(emptyList())
+    }
 
     val scope = rememberCoroutineScope()
 
@@ -42,6 +48,8 @@ onRecurringExpensesClick: () -> Unit
         scope.launch {
             expenses = expenseViewModel.getAllExpenses()
             budgets = budgetViewModel.getAllBudgets()
+            recurringExpenses =
+                recurringExpenseViewModel.getAllRecurringExpenses()
         }
     }
 

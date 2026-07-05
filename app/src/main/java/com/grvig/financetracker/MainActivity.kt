@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
                         DashboardScreen(
                             expenseViewModel = expenseViewModel,
                             budgetViewModel = budgetViewModel,
+                            recurringExpenseViewModel = recurringExpenseViewModel,
                             onAddExpenseClick = {
                                 currentScreen =
                                     Screen.ADD_EXPENSE
