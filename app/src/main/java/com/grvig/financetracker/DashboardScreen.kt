@@ -16,6 +16,7 @@ import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
 import com.grvig.financetracker.data.Budget
 import com.grvig.financetracker.viewmodel.BudgetViewModel
 import com.grvig.financetracker.data.RecurringExpense
@@ -62,6 +63,42 @@ onRecurringExpensesClick: () -> Unit
 
     LaunchedEffect(Unit) {
         scope.launch {
+
+            val dueRecurringExpenses = recurringExpenseViewModel
+                .getAllRecurringExpenses()
+                .filter {
+                    it.isActive &&
+                        it.nextDueDate <= LocalDate.now().toString()
+                }
+
+            dueRecurringExpenses.forEach { recurringExpense ->
+
+                expenseViewModel.insertExpense(
+                    Expense(
+                        amount = recurringExpense.amount,
+                        category = recurringExpense.category,
+                        paymentMethod = recurringExpense.paymentMethod,
+                        cardName = recurringExpense.cardName,
+                        description = recurringExpense.title,
+                        notes = recurringExpense.notes,
+                        date = recurringExpense.nextDueDate,
+                        time = LocalTime.now().toString(),
+                        isRecurring = true
+                    )
+                )
+
+                recurringExpenseViewModel.updateRecurringExpense(
+                    recurringExpense.copy(
+                        nextDueDate = nextDueDateAfter(
+                            recurringExpense.nextDueDate,
+                            recurringExpense.frequency
+                        )
+                    )
+                )
+            }
+
+            kotlinx.coroutines.delay(200)
+
             expenses = expenseViewModel.getAllExpenses()
             budgets = budgetViewModel.getAllBudgets()
             recurringExpenses =
