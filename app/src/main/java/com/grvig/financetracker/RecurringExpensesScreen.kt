@@ -37,6 +37,7 @@ fun RecurringExpensesScreen(
 
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
 
     var category by remember {
         mutableStateOf("Food")
@@ -145,6 +146,17 @@ fun RecurringExpensesScreen(
             },
             label = {
                 Text("Amount")
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = notes,
+            onValueChange = {
+                notes = it
+            },
+            label = {
+                Text("Notes")
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -302,6 +314,7 @@ fun RecurringExpensesScreen(
                             amount = amountValue,
                             category = category,
                             paymentMethod = paymentMethod,
+                            notes = notes,
                             frequency = frequency
                         )
                     } else {
@@ -311,7 +324,7 @@ fun RecurringExpensesScreen(
                             category = category,
                             paymentMethod = paymentMethod,
                             cardName = null,
-                            notes = "",
+                            notes = notes,
                             frequency = frequency,
                             nextDueDate = LocalDate.now().toString(),
                             isActive = true
@@ -335,6 +348,7 @@ fun RecurringExpensesScreen(
 
                     title = ""
                     amount = ""
+                    notes = ""
                     editingRecurringExpense = null
                 } else {
 
@@ -403,6 +417,7 @@ fun RecurringExpensesScreen(
 
                                 title = recurringExpense.title
                                 amount = recurringExpense.amount.toString()
+                                notes = recurringExpense.notes
                                 category = recurringExpense.category
                                 paymentMethod = recurringExpense.paymentMethod
                                 frequency = recurringExpense.frequency
