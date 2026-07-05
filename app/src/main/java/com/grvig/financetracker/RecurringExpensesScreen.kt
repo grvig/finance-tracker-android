@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -89,6 +90,10 @@ fun RecurringExpensesScreen(
     }
 
     var editingRecurringExpense by remember {
+        mutableStateOf<RecurringExpense?>(null)
+    }
+
+    var recurringExpenseToDelete by remember {
         mutableStateOf<RecurringExpense?>(null)
     }
 
@@ -455,14 +460,7 @@ fun RecurringExpensesScreen(
 
                         Button(
                             onClick = {
-
-                                recurringExpenseViewModel.deleteRecurringExpense(
-                                    recurringExpense
-                                )
-
-                                scope.launch {
-                                    refreshRecurringExpenses()
-                                }
+                                recurringExpenseToDelete = recurringExpense
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -473,6 +471,48 @@ fun RecurringExpensesScreen(
                     }
                 }
             }
+        }
+
+        recurringExpenseToDelete?.let { recurringExpense ->
+
+            AlertDialog(
+                onDismissRequest = {
+                    recurringExpenseToDelete = null
+                },
+                title = {
+                    Text("Delete Recurring Expense")
+                },
+                text = {
+                    Text("Are you sure you want to delete this recurring expense?")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+
+                            recurringExpenseViewModel.deleteRecurringExpense(
+                                recurringExpense
+                            )
+
+                            scope.launch {
+                                refreshRecurringExpenses()
+                            }
+
+                            recurringExpenseToDelete = null
+                        }
+                    ) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            recurringExpenseToDelete = null
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
 
         SnackbarHost(
