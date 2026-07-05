@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -49,6 +51,10 @@ fun BudgetScreen(
     }
     var editingBudget by remember {
         mutableStateOf<Budget?>(null)
+    }
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
     }
 
     val scope = rememberCoroutineScope()
@@ -192,6 +198,13 @@ fun BudgetScreen(
                     monthlyLimit = ""
                     warningPercent = ""
                     editingBudget = null
+                } else {
+
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            "Please enter a category, monthly limit and warning percent"
+                        )
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -287,5 +300,9 @@ fun BudgetScreen(
                 }
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState
+        )
     }
 }
