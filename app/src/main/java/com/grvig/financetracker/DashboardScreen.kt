@@ -132,6 +132,26 @@ onRecurringExpensesClick: () -> Unit
         .sumOf {
             it.amount
         }
+
+    val lastMonth = LocalDate.now()
+        .minusMonths(1)
+        .toString()
+        .substring(0, 7)
+
+    val lastMonthSpent = expenses
+        .filter {
+            it.date.startsWith(lastMonth)
+        }
+        .sumOf {
+            it.amount
+        }
+
+    val monthlyChangePercent = if (lastMonthSpent > 0) {
+        (((monthSpent - lastMonthSpent) / lastMonthSpent) * 100).toInt()
+    } else {
+        0
+    }
+
     val totalBudget = budgets.sumOf {
         it.monthlyLimit
     }
@@ -198,6 +218,7 @@ onRecurringExpensesClick: () -> Unit
             ) {
                 Text("Today's Spending: ₹$todaySpent")
                 Text("This Month's Spending: ₹$monthSpent")
+                Text("Change From Last Month: $monthlyChangePercent%")
             }
         }
         Card(
