@@ -21,6 +21,22 @@ import com.grvig.financetracker.viewmodel.BudgetViewModel
 import com.grvig.financetracker.data.RecurringExpense
 import com.grvig.financetracker.viewmodel.RecurringExpenseViewModel
 
+private fun nextDueDateAfter(
+    currentDueDate: String,
+    frequency: String
+): String {
+
+    val dueDate = LocalDate.parse(currentDueDate)
+
+    val advancedDate = if (frequency == "Weekly") {
+        dueDate.plusWeeks(1)
+    } else {
+        dueDate.plusMonths(1)
+    }
+
+    return advancedDate.toString()
+}
+
 @Composable
 fun DashboardScreen(
 expenseViewModel: ExpenseViewModel,
