@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -73,6 +74,10 @@ fun ExpenseListScreen(
         "Highest Amount",
         "Lowest Amount"
     )
+
+    var expenseToDelete by remember {
+        mutableStateOf<Expense?>(null)
+    }
 
     val scope = rememberCoroutineScope()
 
@@ -288,15 +293,7 @@ fun ExpenseListScreen(
 
                         Button(
                             onClick = {
-
-                                expenseViewModel.deleteExpense(
-                                    expense
-                                )
-
-                                scope.launch {
-                                    delay(200)
-                                    refreshExpenses()
-                                }
+                                expenseToDelete = expense
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -307,6 +304,49 @@ fun ExpenseListScreen(
                     }
                 }
             }
+        }
+
+        expenseToDelete?.let { expense ->
+
+            AlertDialog(
+                onDismissRequest = {
+                    expenseToDelete = null
+                },
+                title = {
+                    Text("Delete Expense")
+                },
+                text = {
+                    Text("Are you sure you want to delete this expense?")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+
+                            expenseViewModel.deleteExpense(
+                                expense
+                            )
+
+                            scope.launch {
+                                delay(200)
+                                refreshExpenses()
+                            }
+
+                            expenseToDelete = null
+                        }
+                    ) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            expenseToDelete = null
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }
