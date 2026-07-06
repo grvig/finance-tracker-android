@@ -110,6 +110,59 @@ private fun CategoryBreakdownChart(
 }
 
 @Composable
+private fun MonthlyTrendChart(
+    monthlyTotals: List<Pair<String, Double>>
+) {
+
+    val maxAmount = monthlyTotals.maxOfOrNull {
+        it.second
+    } ?: 0.0
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+
+        monthlyTotals.forEach { (month, amount) ->
+
+            val barHeightFraction = if (maxAmount > 0) {
+                (amount / maxAmount).toFloat()
+            } else {
+                0f
+            }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Canvas(
+                    modifier = Modifier
+                        .width(24.dp)
+                        .height(80.dp)
+                ) {
+                    drawRect(
+                        color = chartColors[0],
+                        topLeft = androidx.compose.ui.geometry.Offset(
+                            0f,
+                            size.height * (1 - barHeightFraction)
+                        ),
+                        size = Size(
+                            size.width,
+                            size.height * barHeightFraction
+                        )
+                    )
+                }
+
+                Text(
+                    text = month,
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun DashboardScreen(
 expenseViewModel: ExpenseViewModel,
 budgetViewModel: BudgetViewModel,
@@ -271,6 +324,24 @@ onRecurringExpensesClick: () -> Unit
             it.second
         }
 
+    val monthlyTotals = (5 downTo 0).map { monthsAgo ->
+
+        val month = LocalDate.now()
+            .minusMonths(monthsAgo.toLong())
+            .toString()
+            .substring(0, 7)
+
+        val spent = expenses
+            .filter {
+                it.date.startsWith(month)
+            }
+            .sumOf {
+                it.amount
+            }
+
+        month.substring(5, 7) to spent
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -349,6 +420,24 @@ onRecurringExpensesClick: () -> Unit
                         categoryTotals = categoryTotals
                     )
                 }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+
+                Text(
+                    text = "Spending Trend (6 Months)",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                MonthlyTrendChart(
+                    monthlyTotals = monthlyTotals
+                )
             }
         }
 
