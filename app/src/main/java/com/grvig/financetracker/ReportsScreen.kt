@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,6 +59,18 @@ fun ReportsScreen(
 
     val monthExpenses = expenses.filter {
         it.date.startsWith(selectedMonth)
+    }
+
+    val totalSpent = monthExpenses.sumOf {
+        it.amount
+    }
+
+    val totalCount = monthExpenses.size
+
+    val averageExpense = if (totalCount > 0) {
+        totalSpent / totalCount
+    } else {
+        0.0
     }
 
     Column(
@@ -122,6 +135,19 @@ fun ReportsScreen(
                         }
                     )
                 }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+
+                Text("Total Spent: ₹$totalSpent")
+                Text("Total Expenses: $totalCount")
+                Text("Average Expense: ₹$averageExpense")
             }
         }
     }
