@@ -152,40 +152,48 @@ fun ReportsScreen(
             }
         }
 
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
+        if (monthExpenses.isEmpty()) {
 
-                Text("Total Spent: ₹$totalSpent")
-                Text("Total Expenses: $totalCount")
-                Text("Average Expense: ₹$averageExpense")
+            Text(
+                text = "No expenses recorded for this month"
+            )
+        } else {
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+
+                    Text("Total Spent: ₹$totalSpent")
+                    Text("Total Expenses: $totalCount")
+                    Text("Average Expense: ₹$averageExpense")
+                }
             }
-        }
 
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
+            Card(
+                modifier = Modifier.fillMaxWidth()
             ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
 
-                Text(
-                    text = "Category Breakdown",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                    Text(
+                        text = "Category Breakdown",
+                        style = MaterialTheme.typography.titleMedium
+                    )
 
-                categoryBreakdown.forEach { (category, amount) ->
+                    categoryBreakdown.forEach { (category, amount) ->
 
-                    val percent = if (totalSpent > 0) {
-                        ((amount / totalSpent) * 100).toInt()
-                    } else {
-                        0
+                        val percent = if (totalSpent > 0) {
+                            ((amount / totalSpent) * 100).toInt()
+                        } else {
+                            0
+                        }
+
+                        Text("$category: ₹$amount ($percent%)")
                     }
-
-                    Text("$category: ₹$amount ($percent%)")
                 }
             }
         }
