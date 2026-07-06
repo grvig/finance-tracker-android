@@ -1,13 +1,16 @@
 package com.grvig.financetracker
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -82,9 +85,19 @@ private fun CategoryBreakdownChart(
                     .padding(vertical = 4.dp)
             ) {
 
+                Box(
+                    modifier = Modifier
+                        .size(12.dp)
+                        .background(
+                            chartColors[index % chartColors.size]
+                        )
+                )
+
                 Text(
                     text = category,
-                    modifier = Modifier.width(90.dp)
+                    modifier = Modifier
+                        .padding(start = 6.dp)
+                        .width(84.dp)
                 )
 
                 Canvas(
