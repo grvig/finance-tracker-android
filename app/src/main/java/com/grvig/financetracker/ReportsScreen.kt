@@ -73,6 +73,20 @@ fun ReportsScreen(
         0.0
     }
 
+    val categoryBreakdown = monthExpenses
+        .groupBy {
+            it.category
+        }
+        .mapValues { entry ->
+            entry.value.sumOf {
+                it.amount
+            }
+        }
+        .toList()
+        .sortedByDescending {
+            it.second
+        }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -148,6 +162,31 @@ fun ReportsScreen(
                 Text("Total Spent: ₹$totalSpent")
                 Text("Total Expenses: $totalCount")
                 Text("Average Expense: ₹$averageExpense")
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+
+                Text(
+                    text = "Category Breakdown",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                categoryBreakdown.forEach { (category, amount) ->
+
+                    val percent = if (totalSpent > 0) {
+                        ((amount / totalSpent) * 100).toInt()
+                    } else {
+                        0
+                    }
+
+                    Text("$category: ₹$amount ($percent%)")
+                }
             }
         }
     }
