@@ -170,7 +170,8 @@ recurringExpenseViewModel: RecurringExpenseViewModel,
 onAddExpenseClick: () -> Unit,
 onViewExpensesClick: () -> Unit,
 onBudgetClick: () -> Unit,
-onRecurringExpensesClick: () -> Unit
+onRecurringExpensesClick: () -> Unit,
+onReportsClick: () -> Unit
 ) {
 
     var expenses by remember {
@@ -466,6 +467,13 @@ onRecurringExpensesClick: () -> Unit
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Recurring Expenses")
+        }
+
+        Button(
+            onClick = onReportsClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Reports")
         }
     }
 }

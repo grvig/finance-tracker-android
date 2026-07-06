@@ -6,5 +6,6 @@ enum class Screen {
     EXPENSE_LIST,
     EDIT_EXPENSE,
     BUDGET,
-    RECURRING_EXPENSES
+    RECURRING_EXPENSES,
+    REPORTS
 }

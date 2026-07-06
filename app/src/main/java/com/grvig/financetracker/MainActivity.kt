@@ -101,6 +101,10 @@ class MainActivity : ComponentActivity() {
                             onRecurringExpensesClick = {
                                 currentScreen =
                                     Screen.RECURRING_EXPENSES
+                            },
+                            onReportsClick = {
+                                currentScreen =
+                                    Screen.REPORTS
                             }
                         )
                     }
@@ -166,6 +170,17 @@ class MainActivity : ComponentActivity() {
 
                         RecurringExpensesScreen(
                             recurringExpenseViewModel = recurringExpenseViewModel,
+                            onDashboardClick = {
+                                currentScreen =
+                                    Screen.DASHBOARD
+                            }
+                        )
+                    }
+
+                    Screen.REPORTS -> {
+
+                        ReportsScreen(
+                            expenseViewModel = expenseViewModel,
                             onDashboardClick = {
                                 currentScreen =
                                     Screen.DASHBOARD
