@@ -1,16 +1,23 @@
 package com.grvig.financetracker
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
@@ -36,6 +43,70 @@ private fun nextDueDateAfter(
     }
 
     return advancedDate.toString()
+}
+
+private val chartColors = listOf(
+    Color(0xFF7aa2f7),
+    Color(0xFFbb9af7),
+    Color(0xFF9ece6a),
+    Color(0xFFe0af68),
+    Color(0xFFf7768e),
+    Color(0xFF7dcfff)
+)
+
+@Composable
+private fun CategoryBreakdownChart(
+    categoryTotals: List<Pair<String, Double>>
+) {
+
+    val maxAmount = categoryTotals.maxOfOrNull {
+        it.second
+    } ?: 0.0
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        categoryTotals.forEachIndexed { index, (category, amount) ->
+
+            val barWidthFraction = if (maxAmount > 0) {
+                (amount / maxAmount).toFloat()
+            } else {
+                0f
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
+
+                Text(
+                    text = category,
+                    modifier = Modifier.width(90.dp)
+                )
+
+                Canvas(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(20.dp)
+                ) {
+                    drawRect(
+                        color = chartColors[index % chartColors.size],
+                        size = Size(
+                            size.width * barWidthFraction,
+                            size.height
+                        )
+                    )
+                }
+
+                Text(
+                    text = "₹$amount"
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -186,6 +257,20 @@ onRecurringExpensesClick: () -> Unit
         0
     }
 
+    val categoryTotals = expenses
+        .groupBy {
+            it.category
+        }
+        .mapValues { entry ->
+            entry.value.sumOf {
+                it.amount
+            }
+        }
+        .toList()
+        .sortedByDescending {
+            it.second
+        }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -243,6 +328,27 @@ onRecurringExpensesClick: () -> Unit
                 Text(
                     "Budget Usage: $budgetUsagePercent%"
                 )
+            }
+        }
+
+        if (categoryTotals.isNotEmpty()) {
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+
+                    Text(
+                        text = "Category Breakdown",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    CategoryBreakdownChart(
+                        categoryTotals = categoryTotals
+                    )
+                }
             }
         }
 
