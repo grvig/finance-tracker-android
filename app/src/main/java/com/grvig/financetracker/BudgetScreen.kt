@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -50,6 +51,10 @@ fun BudgetScreen(
         mutableStateOf<List<Expense>>(emptyList())
     }
     var editingBudget by remember {
+        mutableStateOf<Budget?>(null)
+    }
+
+    var budgetToDelete by remember {
         mutableStateOf<Budget?>(null)
     }
 
@@ -281,14 +286,7 @@ fun BudgetScreen(
                         }
                         Button(
                             onClick = {
-
-                                budgetViewModel.deleteBudget(
-                                    budget
-                                )
-
-                                scope.launch {
-                                    refreshBudgets()
-                                }
+                                budgetToDelete = budget
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -299,6 +297,48 @@ fun BudgetScreen(
                     }
                 }
             }
+        }
+
+        budgetToDelete?.let { budget ->
+
+            AlertDialog(
+                onDismissRequest = {
+                    budgetToDelete = null
+                },
+                title = {
+                    Text("Delete Budget")
+                },
+                text = {
+                    Text("Are you sure you want to delete this budget?")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+
+                            budgetViewModel.deleteBudget(
+                                budget
+                            )
+
+                            scope.launch {
+                                refreshBudgets()
+                            }
+
+                            budgetToDelete = null
+                        }
+                    ) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            budgetToDelete = null
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
 
         SnackbarHost(
