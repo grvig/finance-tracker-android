@@ -181,6 +181,7 @@ class MainActivity : ComponentActivity() {
 
                         ReportsScreen(
                             expenseViewModel = expenseViewModel,
+                            budgetViewModel = budgetViewModel,
                             onDashboardClick = {
                                 currentScreen =
                                     Screen.DASHBOARD

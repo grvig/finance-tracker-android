@@ -19,7 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.grvig.financetracker.data.Budget
 import com.grvig.financetracker.data.Expense
+import com.grvig.financetracker.viewmodel.BudgetViewModel
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -28,11 +30,16 @@ import java.time.LocalDate
 @Composable
 fun ReportsScreen(
     expenseViewModel: ExpenseViewModel,
+    budgetViewModel: BudgetViewModel,
     onDashboardClick: () -> Unit
 ) {
 
     var expenses by remember {
         mutableStateOf<List<Expense>>(emptyList())
+    }
+
+    var budgets by remember {
+        mutableStateOf<List<Budget>>(emptyList())
     }
 
     val months = (0..11).map { monthsAgo ->
@@ -55,6 +62,7 @@ fun ReportsScreen(
     LaunchedEffect(Unit) {
         scope.launch {
             expenses = expenseViewModel.getAllExpenses()
+            budgets = budgetViewModel.getAllBudgets()
         }
     }
 
@@ -72,6 +80,16 @@ fun ReportsScreen(
         totalSpent / totalCount
     } else {
         0.0
+    }
+
+    val totalBudget = budgets.sumOf {
+        it.monthlyLimit
+    }
+
+    val budgetUsagePercent = if (totalBudget > 0) {
+        ((totalSpent / totalBudget) * 100).toInt()
+    } else {
+        0
     }
 
     val categoryBreakdown = monthExpenses
@@ -172,6 +190,10 @@ fun ReportsScreen(
                     Text("Total Spent: ₹$totalSpent")
                     Text("Total Expenses: $totalCount")
                     Text("Average Expense: ₹$averageExpense")
+
+                    if (totalBudget > 0) {
+                        Text("Budget Usage: $budgetUsagePercent%")
+                    }
                 }
             }
 
