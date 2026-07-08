@@ -156,6 +156,7 @@ fun BudgetScreen(
                     limitValue != null &&
                     limitValue > 0 &&
                     warningValue != null &&
+                    warningValue in 0..100 &&
                     category.isNotBlank()
                 ) {
 
