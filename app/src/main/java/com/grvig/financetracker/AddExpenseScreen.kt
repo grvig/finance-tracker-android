@@ -226,7 +226,7 @@ fun AddExpenseScreen(
                 val amountValue =
                     amount.toDoubleOrNull()
 
-                if (amountValue == null) {
+                if (amountValue == null || amountValue <= 0) {
 
                     scope.launch {
                         snackbarHostState.showSnackbar(

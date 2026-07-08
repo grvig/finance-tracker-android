@@ -228,7 +228,7 @@ fun EditExpenseScreen(
 
                 val amountValue = amount.toDoubleOrNull()
 
-                if (amountValue != null) {
+                if (amountValue != null && amountValue > 0) {
 
                     val updatedExpense =
                         expense.copy(
