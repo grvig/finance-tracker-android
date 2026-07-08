@@ -227,6 +227,13 @@ fun BudgetScreen(
             style = MaterialTheme.typography.headlineSmall
         )
 
+        if (budgets.isEmpty()) {
+
+            Text(
+                text = "No budgets created yet"
+            )
+        }
+
         LazyColumn {
 
             items(budgets) { budget ->
