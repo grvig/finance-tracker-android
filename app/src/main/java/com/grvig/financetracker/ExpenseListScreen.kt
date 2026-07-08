@@ -263,6 +263,14 @@ fun ExpenseListScreen(
             }
         }
 
+        if (sortedExpenses.isEmpty()) {
+
+            Text(
+                text = "No expenses found",
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
         LazyColumn {
 
             items(sortedExpenses) { expense ->
