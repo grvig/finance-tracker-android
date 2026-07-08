@@ -386,6 +386,13 @@ fun RecurringExpensesScreen(
             style = MaterialTheme.typography.headlineSmall
         )
 
+        if (recurringExpenses.isEmpty()) {
+
+            Text(
+                text = "No recurring expenses set up yet"
+            )
+        }
+
         LazyColumn {
 
             items(recurringExpenses) { recurringExpense ->
