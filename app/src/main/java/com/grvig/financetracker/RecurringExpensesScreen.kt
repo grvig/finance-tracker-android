@@ -316,7 +316,7 @@ fun RecurringExpensesScreen(
 
                 val amountValue = amount.toDoubleOrNull()
 
-                if (amountValue != null && title.isNotBlank()) {
+                if (amountValue != null && amountValue > 0 && title.isNotBlank()) {
 
                     val recurringExpense = if (
                         editingRecurringExpense != null
