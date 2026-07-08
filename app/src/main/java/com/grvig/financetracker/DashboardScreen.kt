@@ -449,9 +449,17 @@ onReportsClick: () -> Unit
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                MonthlyTrendChart(
-                    monthlyTotals = monthlyTotals
-                )
+                if (monthlyTotals.all { it.second == 0.0 }) {
+
+                    Text(
+                        text = "No spending data yet"
+                    )
+                } else {
+
+                    MonthlyTrendChart(
+                        monthlyTotals = monthlyTotals
+                    )
+                }
             }
         }
 
