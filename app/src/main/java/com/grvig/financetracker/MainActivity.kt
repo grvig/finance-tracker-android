@@ -17,6 +17,12 @@ import com.grvig.financetracker.viewmodel.BudgetViewModelFactory
 import com.grvig.financetracker.repository.RecurringExpenseRepository
 import com.grvig.financetracker.viewmodel.RecurringExpenseViewModel
 import com.grvig.financetracker.viewmodel.RecurringExpenseViewModelFactory
+import com.grvig.financetracker.repository.AuthRepository
+import com.grvig.financetracker.viewmodel.AuthViewModel
+import com.grvig.financetracker.viewmodel.AuthViewModelFactory
+import com.grvig.financetracker.repository.HouseholdRepository
+import com.grvig.financetracker.viewmodel.HouseholdViewModel
+import com.grvig.financetracker.viewmodel.HouseholdViewModelFactory
 import androidx.compose.material3.Text
 
 class MainActivity : ComponentActivity() {
@@ -24,6 +30,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var expenseViewModel: ExpenseViewModel
     private lateinit var budgetViewModel: BudgetViewModel
     private lateinit var recurringExpenseViewModel: RecurringExpenseViewModel
+    private lateinit var authViewModel: AuthViewModel
+    private lateinit var householdViewModel: HouseholdViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,11 +76,38 @@ class MainActivity : ComponentActivity() {
             recurringExpenseFactory
         )[RecurringExpenseViewModel::class.java]
 
+        val authRepository = AuthRepository()
+
+        val authFactory = AuthViewModelFactory(
+            authRepository
+        )
+
+        authViewModel = ViewModelProvider(
+            this,
+            authFactory
+        )[AuthViewModel::class.java]
+
+        val householdRepository = HouseholdRepository()
+
+        val householdFactory = HouseholdViewModelFactory(
+            householdRepository
+        )
+
+        householdViewModel = ViewModelProvider(
+            this,
+            householdFactory
+        )[HouseholdViewModel::class.java]
+
         setContent {
             FinanceTrackerTheme {
 
                 var currentScreen by remember {
-                    mutableStateOf(Screen.DASHBOARD)
+                    mutableStateOf(
+                        if (authViewModel.currentUser != null)
+                            Screen.DASHBOARD
+                        else
+                            Screen.LOGIN
+                    )
                 }
 
                 var selectedExpense by remember {
@@ -80,6 +115,48 @@ class MainActivity : ComponentActivity() {
                 }
 
                 when (currentScreen) {
+
+                    Screen.LOGIN -> {
+
+                        LoginScreen(
+                            authViewModel = authViewModel,
+                            onLoginSuccess = {
+                                currentScreen =
+                                    Screen.DASHBOARD
+                            },
+                            onSignUpClick = {
+                                currentScreen =
+                                    Screen.SIGNUP
+                            }
+                        )
+                    }
+
+                    Screen.SIGNUP -> {
+
+                        SignUpScreen(
+                            authViewModel = authViewModel,
+                            onSignUpSuccess = {
+                                currentScreen =
+                                    Screen.HOUSEHOLD_SETUP
+                            },
+                            onLoginClick = {
+                                currentScreen =
+                                    Screen.LOGIN
+                            }
+                        )
+                    }
+
+                    Screen.HOUSEHOLD_SETUP -> {
+
+                        HouseholdSetupScreen(
+                            householdViewModel = householdViewModel,
+                            userId = authViewModel.currentUser?.uid ?: "",
+                            onHouseholdReady = {
+                                currentScreen =
+                                    Screen.DASHBOARD
+                            }
+                        )
+                    }
 
                     Screen.DASHBOARD -> {
                         DashboardScreen(
