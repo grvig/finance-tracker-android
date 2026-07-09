@@ -184,7 +184,8 @@ onAddExpenseClick: () -> Unit,
 onViewExpensesClick: () -> Unit,
 onBudgetClick: () -> Unit,
 onRecurringExpensesClick: () -> Unit,
-onReportsClick: () -> Unit
+onReportsClick: () -> Unit,
+onSignOutClick: () -> Unit
 ) {
 
     var expenses by remember {
@@ -495,6 +496,13 @@ onReportsClick: () -> Unit
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Reports")
+        }
+
+        Button(
+            onClick = onSignOutClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Sign Out")
         }
     }
 }

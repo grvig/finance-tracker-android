@@ -182,6 +182,11 @@ class MainActivity : ComponentActivity() {
                             onReportsClick = {
                                 currentScreen =
                                     Screen.REPORTS
+                            },
+                            onSignOutClick = {
+                                authViewModel.signOut()
+                                currentScreen =
+                                    Screen.LOGIN
                             }
                         )
                     }
