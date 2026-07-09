@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "989471932740",
+    "project_id": "financetracker-af26d",
+    "storage_bucket": "financetracker-af26d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:989471932740:android:3dc0de0249c7749cb95711",
+        "android_client_info": {
+          "package_name": "com.grvig.financetracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWF_MzFkXJXRuKa-BXifVQzX__lTWl4v0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
