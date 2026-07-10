@@ -9,5 +9,6 @@ data class Budget(
     val id: Int = 0,
     val category: String,
     val monthlyLimit: Double,
-    val warningPercent: Int
+    val warningPercent: Int,
+    val householdId: String = ""
 )
