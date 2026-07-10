@@ -15,5 +15,6 @@ data class Expense(
     val notes: String,
     val date: String,
     val time: String,
-    val isRecurring: Boolean
+    val isRecurring: Boolean,
+    val householdId: String = ""
 )
