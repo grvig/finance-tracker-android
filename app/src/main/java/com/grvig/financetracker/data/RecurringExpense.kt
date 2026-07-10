@@ -15,5 +15,6 @@ data class RecurringExpense(
     val notes: String,
     val frequency: String,
     val nextDueDate: String,
-    val isActive: Boolean
+    val isActive: Boolean,
+    val householdId: String = ""
 )
