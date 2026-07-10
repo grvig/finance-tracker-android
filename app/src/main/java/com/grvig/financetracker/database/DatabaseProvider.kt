@@ -18,7 +18,9 @@ object DatabaseProvider {
                 context.applicationContext,
                 AppDatabase::class.java,
                 "finance_tracker.db"
-            ).build()
+            )
+                .fallbackToDestructiveMigration(true)
+                .build()
 
             INSTANCE = instance
 

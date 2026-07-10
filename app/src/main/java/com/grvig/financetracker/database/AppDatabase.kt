@@ -15,7 +15,7 @@ import com.grvig.financetracker.data.RecurringExpense
         Budget::class,
         RecurringExpense::class
     ],
-    version = 1
+    version = 2
 )
 abstract class AppDatabase : RoomDatabase() {
 
