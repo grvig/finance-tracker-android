@@ -1,32 +1,56 @@
 package com.grvig.financetracker.repository
 
-import com.grvig.financetracker.dao.BudgetDao
+import com.google.firebase.firestore.FirebaseFirestore
+import com.grvig.financetracker.SessionManager
 import com.grvig.financetracker.data.Budget
+import kotlinx.coroutines.tasks.await
 
-class BudgetRepository(
-    private val budgetDao: BudgetDao
-) {
+class BudgetRepository {
+
+    private val db = FirebaseFirestore.getInstance()
+
+    private fun budgets() =
+        db.collection("households")
+            .document(SessionManager.currentHouseholdId)
+            .collection("budgets")
 
     suspend fun insertBudget(
         budget: Budget
     ) {
-        budgetDao.insertBudget(budget)
+        val docRef = budgets().document()
+
+        docRef.set(
+            budget.copy(
+                id = docRef.id,
+                householdId = SessionManager.currentHouseholdId
+            )
+        ).await()
     }
 
     suspend fun updateBudget(
         budget: Budget
     ) {
-        budgetDao.updateBudget(budget)
+        budgets().document(budget.id)
+            .set(budget)
+            .await()
     }
 
     suspend fun deleteBudget(
         budget: Budget
     ) {
-        budgetDao.deleteBudget(budget)
+        budgets().document(budget.id)
+            .delete()
+            .await()
     }
 
     suspend fun getAllBudgets():
             List<Budget> {
-        return budgetDao.getAllBudgets()
+        return budgets()
+            .get()
+            .await()
+            .documents
+            .mapNotNull {
+                it.toObject(Budget::class.java)
+            }
     }
 }

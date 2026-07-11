@@ -48,9 +48,7 @@ class MainActivity : ComponentActivity() {
             this,
             factory
         )[ExpenseViewModel::class.java]
-        val budgetRepository = BudgetRepository(
-            database.budgetDao()
-        )
+        val budgetRepository = BudgetRepository()
 
         val budgetFactory = BudgetViewModelFactory(
             budgetRepository
