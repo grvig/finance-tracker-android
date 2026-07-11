@@ -1,6 +1,7 @@
 package com.grvig.financetracker
 
 enum class Screen {
+    LOADING,
     LOGIN,
     SIGNUP,
     HOUSEHOLD_SETUP,

@@ -23,6 +23,11 @@ import com.grvig.financetracker.repository.HouseholdRepository
 import com.grvig.financetracker.viewmodel.HouseholdViewModel
 import com.grvig.financetracker.viewmodel.HouseholdViewModelFactory
 import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -95,7 +100,7 @@ class MainActivity : ComponentActivity() {
                 var currentScreen by remember {
                     mutableStateOf(
                         if (authViewModel.currentUser != null)
-                            Screen.DASHBOARD
+                            Screen.LOADING
                         else
                             Screen.LOGIN
                     )
@@ -105,7 +110,38 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf<Expense?>(null)
                 }
 
+                val scope = rememberCoroutineScope()
+
                 when (currentScreen) {
+
+                    Screen.LOADING -> {
+
+                        LaunchedEffect(Unit) {
+                            scope.launch {
+
+                                val userId = authViewModel.currentUser?.uid ?: ""
+
+                                val profile = householdViewModel.getUserProfile(
+                                    userId
+                                )
+
+                                SessionManager.currentHouseholdId =
+                                    profile?.householdId ?: ""
+
+                                currentScreen = if (SessionManager.currentHouseholdId.isBlank())
+                                    Screen.HOUSEHOLD_SETUP
+                                else
+                                    Screen.DASHBOARD
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Loading...")
+                        }
+                    }
 
                     Screen.LOGIN -> {
 
@@ -179,6 +215,7 @@ class MainActivity : ComponentActivity() {
                             },
                             onSignOutClick = {
                                 authViewModel.signOut()
+                                SessionManager.currentHouseholdId = ""
                                 currentScreen =
                                     Screen.LOGIN
                             }
