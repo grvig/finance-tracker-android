@@ -1,32 +1,56 @@
 package com.grvig.financetracker.repository
 
-import com.grvig.financetracker.dao.ExpenseDao
+import com.google.firebase.firestore.FirebaseFirestore
+import com.grvig.financetracker.SessionManager
 import com.grvig.financetracker.data.Expense
+import kotlinx.coroutines.tasks.await
 
-class ExpenseRepository(
-    private val expenseDao: ExpenseDao
-) {
+class ExpenseRepository {
+
+    private val db = FirebaseFirestore.getInstance()
+
+    private fun expenses() =
+        db.collection("households")
+            .document(SessionManager.currentHouseholdId)
+            .collection("expenses")
 
     suspend fun insertExpense(
         expense: Expense
     ) {
-        expenseDao.insertExpense(expense)
+        val docRef = expenses().document()
+
+        docRef.set(
+            expense.copy(
+                id = docRef.id,
+                householdId = SessionManager.currentHouseholdId
+            )
+        ).await()
     }
 
     suspend fun updateExpense(
         expense: Expense
     ) {
-        expenseDao.updateExpense(expense)
+        expenses().document(expense.id)
+            .set(expense)
+            .await()
     }
 
     suspend fun deleteExpense(
         expense: Expense
     ) {
-        expenseDao.deleteExpense(expense)
+        expenses().document(expense.id)
+            .delete()
+            .await()
     }
 
     suspend fun getAllExpenses():
             List<Expense> {
-        return expenseDao.getAllExpenses()
+        return expenses()
+            .get()
+            .await()
+            .documents
+            .mapNotNull {
+                it.toObject(Expense::class.java)
+            }
     }
 }

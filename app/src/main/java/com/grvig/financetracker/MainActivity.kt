@@ -38,9 +38,7 @@ class MainActivity : ComponentActivity() {
 
         val database = DatabaseProvider.getDatabase(this)
 
-        val repository = ExpenseRepository(
-            database.expenseDao()
-        )
+        val repository = ExpenseRepository()
 
         val factory = ExpenseViewModelFactory(
             repository
