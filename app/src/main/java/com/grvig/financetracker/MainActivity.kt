@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModelProvider
 import com.grvig.financetracker.data.Expense
-import com.grvig.financetracker.database.DatabaseProvider
 import com.grvig.financetracker.repository.ExpenseRepository
 import com.grvig.financetracker.ui.theme.FinanceTrackerTheme
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
@@ -36,8 +35,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val database = DatabaseProvider.getDatabase(this)
-
         val repository = ExpenseRepository()
 
         val factory = ExpenseViewModelFactory(
@@ -59,9 +56,7 @@ class MainActivity : ComponentActivity() {
             budgetFactory
         )[BudgetViewModel::class.java]
 
-        val recurringExpenseRepository = RecurringExpenseRepository(
-            database.recurringExpenseDao()
-        )
+        val recurringExpenseRepository = RecurringExpenseRepository()
 
         val recurringExpenseFactory = RecurringExpenseViewModelFactory(
             recurringExpenseRepository

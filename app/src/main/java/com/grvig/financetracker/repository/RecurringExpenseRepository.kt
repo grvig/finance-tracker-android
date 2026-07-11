@@ -1,32 +1,56 @@
 package com.grvig.financetracker.repository
 
-import com.grvig.financetracker.dao.RecurringExpenseDao
+import com.google.firebase.firestore.FirebaseFirestore
+import com.grvig.financetracker.SessionManager
 import com.grvig.financetracker.data.RecurringExpense
+import kotlinx.coroutines.tasks.await
 
-class RecurringExpenseRepository(
-    private val recurringExpenseDao: RecurringExpenseDao
-) {
+class RecurringExpenseRepository {
+
+    private val db = FirebaseFirestore.getInstance()
+
+    private fun recurringExpenses() =
+        db.collection("households")
+            .document(SessionManager.currentHouseholdId)
+            .collection("recurringExpenses")
 
     suspend fun insertRecurringExpense(
         recurringExpense: RecurringExpense
     ) {
-        recurringExpenseDao.insertRecurringExpense(recurringExpense)
+        val docRef = recurringExpenses().document()
+
+        docRef.set(
+            recurringExpense.copy(
+                id = docRef.id,
+                householdId = SessionManager.currentHouseholdId
+            )
+        ).await()
     }
 
     suspend fun updateRecurringExpense(
         recurringExpense: RecurringExpense
     ) {
-        recurringExpenseDao.updateRecurringExpense(recurringExpense)
+        recurringExpenses().document(recurringExpense.id)
+            .set(recurringExpense)
+            .await()
     }
 
     suspend fun deleteRecurringExpense(
         recurringExpense: RecurringExpense
     ) {
-        recurringExpenseDao.deleteRecurringExpense(recurringExpense)
+        recurringExpenses().document(recurringExpense.id)
+            .delete()
+            .await()
     }
 
     suspend fun getAllRecurringExpenses():
             List<RecurringExpense> {
-        return recurringExpenseDao.getAllRecurringExpenses()
+        return recurringExpenses()
+            .get()
+            .await()
+            .documents
+            .mapNotNull {
+                it.toObject(RecurringExpense::class.java)
+            }
     }
 }
