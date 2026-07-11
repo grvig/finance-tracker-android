@@ -60,6 +60,7 @@ fun HouseholdSetupScreen(
                     isLoading = false
 
                     result.onSuccess { household ->
+                        SessionManager.currentHouseholdId = household.id
                         createdCode = household.code
                     }
 
@@ -119,7 +120,8 @@ fun HouseholdSetupScreen(
 
                     isLoading = false
 
-                    result.onSuccess {
+                    result.onSuccess { household ->
+                        SessionManager.currentHouseholdId = household.id
                         onHouseholdReady()
                     }
 
