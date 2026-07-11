@@ -66,6 +66,17 @@ class HouseholdRepository {
         }
     }
 
+    suspend fun getUserProfile(userId: String): UserProfile? {
+        return try {
+            users.document(userId)
+                .get()
+                .await()
+                .toObject(UserProfile::class.java)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     suspend fun getHousehold(householdId: String): Household? {
         return try {
             households.document(householdId)

@@ -2,11 +2,18 @@ package com.grvig.financetracker.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.grvig.financetracker.data.Household
+import com.grvig.financetracker.data.UserProfile
 import com.grvig.financetracker.repository.HouseholdRepository
 
 class HouseholdViewModel(
     private val repository: HouseholdRepository
 ) : ViewModel() {
+
+    suspend fun getUserProfile(
+        userId: String
+    ): UserProfile? {
+        return repository.getUserProfile(userId)
+    }
 
     suspend fun createHousehold(
         userId: String
