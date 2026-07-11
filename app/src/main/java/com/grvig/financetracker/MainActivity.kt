@@ -120,9 +120,12 @@ class MainActivity : ComponentActivity() {
 
                         LoginScreen(
                             authViewModel = authViewModel,
-                            onLoginSuccess = {
-                                currentScreen =
+                            householdViewModel = householdViewModel,
+                            onLoginSuccess = { hasHousehold ->
+                                currentScreen = if (hasHousehold)
                                     Screen.DASHBOARD
+                                else
+                                    Screen.HOUSEHOLD_SETUP
                             },
                             onSignUpClick = {
                                 currentScreen =
