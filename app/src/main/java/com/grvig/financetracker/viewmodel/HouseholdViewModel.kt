@@ -33,4 +33,11 @@ class HouseholdViewModel(
     ): Household? {
         return repository.getHousehold(householdId)
     }
+
+    suspend fun leaveHousehold(
+        householdId: String,
+        userId: String
+    ): Result<Unit> {
+        return repository.leaveHousehold(householdId, userId)
+    }
 }
