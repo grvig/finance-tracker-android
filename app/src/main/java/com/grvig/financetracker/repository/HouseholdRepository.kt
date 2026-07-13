@@ -66,6 +66,39 @@ class HouseholdRepository {
         }
     }
 
+    suspend fun leaveHousehold(
+        householdId: String,
+        userId: String
+    ): Result<Unit> {
+        return try {
+
+            val household = getHousehold(householdId)
+                ?: return Result.failure(
+                    Exception("Household not found")
+                )
+
+            val updatedMembers = household.memberIds - userId
+
+            households.document(householdId)
+                .update("memberIds", updatedMembers)
+                .await()
+
+            users.document(userId)
+                .set(
+                    UserProfile(
+                        uid = userId,
+                        householdId = ""
+                    ),
+                    SetOptions.merge()
+                )
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun getUserProfile(userId: String): UserProfile? {
         return try {
             users.document(userId)
