@@ -13,6 +13,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Household
 import com.grvig.financetracker.viewmodel.HouseholdViewModel
@@ -35,6 +37,7 @@ fun HouseholdInfoScreen(
     }
 
     val scope = rememberCoroutineScope()
+    val clipboardManager = LocalClipboardManager.current
 
     LaunchedEffect(Unit) {
         scope.launch {
@@ -73,6 +76,17 @@ fun HouseholdInfoScreen(
             Text(
                 text = "Members: ${current.memberIds.size}"
             )
+
+            Button(
+                onClick = {
+                    clipboardManager.setText(
+                        AnnotatedString(current.code)
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Copy Code")
+            }
 
             Button(
                 onClick = {
