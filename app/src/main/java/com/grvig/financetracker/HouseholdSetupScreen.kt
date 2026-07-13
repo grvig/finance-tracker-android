@@ -112,6 +112,12 @@ fun HouseholdSetupScreen(
             onClick = {
 
                 errorMessage = null
+
+                if (joinCode.isBlank()) {
+                    errorMessage = "Please enter a household code"
+                    return@Button
+                }
+
                 isLoading = true
 
                 scope.launch {
