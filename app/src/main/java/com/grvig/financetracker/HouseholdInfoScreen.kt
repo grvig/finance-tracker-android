@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,11 +21,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun HouseholdInfoScreen(
     householdViewModel: HouseholdViewModel,
-    onDashboardClick: () -> Unit
+    userId: String,
+    onDashboardClick: () -> Unit,
+    onLeaveHousehold: () -> Unit
 ) {
 
     var household by remember {
         mutableStateOf<Household?>(null)
+    }
+
+    var showLeaveConfirmation by remember {
+        mutableStateOf(false)
     }
 
     val scope = rememberCoroutineScope()
@@ -65,6 +72,59 @@ fun HouseholdInfoScreen(
 
             Text(
                 text = "Members: ${current.memberIds.size}"
+            )
+
+            Button(
+                onClick = {
+                    showLeaveConfirmation = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Leave Household")
+            }
+        }
+
+        if (showLeaveConfirmation) {
+
+            AlertDialog(
+                onDismissRequest = {
+                    showLeaveConfirmation = false
+                },
+                title = {
+                    Text("Leave Household")
+                },
+                text = {
+                    Text("Are you sure you want to leave this household?")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+
+                            scope.launch {
+
+                                householdViewModel.leaveHousehold(
+                                    SessionManager.currentHouseholdId,
+                                    userId
+                                )
+
+                                SessionManager.currentHouseholdId = ""
+                                showLeaveConfirmation = false
+                                onLeaveHousehold()
+                            }
+                        }
+                    ) {
+                        Text("Leave")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            showLeaveConfirmation = false
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
             )
         }
     }
