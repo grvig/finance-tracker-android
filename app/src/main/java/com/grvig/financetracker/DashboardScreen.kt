@@ -187,6 +187,7 @@ onViewExpensesClick: () -> Unit,
 onBudgetClick: () -> Unit,
 onRecurringExpensesClick: () -> Unit,
 onReportsClick: () -> Unit,
+onHouseholdClick: () -> Unit,
 onSignOutClick: () -> Unit
 ) {
 
@@ -499,6 +500,13 @@ onSignOutClick: () -> Unit
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Reports")
+        }
+
+        Button(
+            onClick = onHouseholdClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Household")
         }
 
         Button(

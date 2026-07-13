@@ -213,6 +213,10 @@ class MainActivity : ComponentActivity() {
                                 currentScreen =
                                     Screen.REPORTS
                             },
+                            onHouseholdClick = {
+                                currentScreen =
+                                    Screen.HOUSEHOLD_INFO
+                            },
                             onSignOutClick = {
                                 authViewModel.signOut()
                                 SessionManager.currentHouseholdId = ""
@@ -298,6 +302,22 @@ class MainActivity : ComponentActivity() {
                             onDashboardClick = {
                                 currentScreen =
                                     Screen.DASHBOARD
+                            }
+                        )
+                    }
+
+                    Screen.HOUSEHOLD_INFO -> {
+
+                        HouseholdInfoScreen(
+                            householdViewModel = householdViewModel,
+                            userId = authViewModel.currentUser?.uid ?: "",
+                            onDashboardClick = {
+                                currentScreen =
+                                    Screen.DASHBOARD
+                            },
+                            onLeaveHousehold = {
+                                currentScreen =
+                                    Screen.HOUSEHOLD_SETUP
                             }
                         )
                     }
