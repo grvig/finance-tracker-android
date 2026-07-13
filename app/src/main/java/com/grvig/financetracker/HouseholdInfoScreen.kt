@@ -36,6 +36,10 @@ fun HouseholdInfoScreen(
         mutableStateOf(false)
     }
 
+    var errorMessage by remember {
+        mutableStateOf<String?>(null)
+    }
+
     val scope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
 
@@ -98,6 +102,10 @@ fun HouseholdInfoScreen(
             }
         }
 
+        errorMessage?.let {
+            Text(text = it)
+        }
+
         if (showLeaveConfirmation) {
 
             AlertDialog(
@@ -116,14 +124,21 @@ fun HouseholdInfoScreen(
 
                             scope.launch {
 
-                                householdViewModel.leaveHousehold(
+                                val result = householdViewModel.leaveHousehold(
                                     SessionManager.currentHouseholdId,
                                     userId
                                 )
 
-                                SessionManager.currentHouseholdId = ""
                                 showLeaveConfirmation = false
-                                onLeaveHousehold()
+
+                                result.onSuccess {
+                                    SessionManager.currentHouseholdId = ""
+                                    onLeaveHousehold()
+                                }
+
+                                result.onFailure {
+                                    errorMessage = it.message ?: "Could not leave household"
+                                }
                             }
                         }
                     ) {
