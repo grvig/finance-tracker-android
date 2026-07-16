@@ -118,6 +118,29 @@ class HouseholdRepository {
         }
     }
 
+    suspend fun getMemberEmails(
+        householdId: String
+    ): Map<String, String> {
+        return try {
+
+            val household = getHousehold(householdId)
+                ?: return emptyMap()
+
+            val emails = mutableMapOf<String, String>()
+
+            for (memberId in household.memberIds) {
+                val profile = getUserProfile(memberId)
+                if (profile != null) {
+                    emails[memberId] = profile.email
+                }
+            }
+
+            emails
+        } catch (e: Exception) {
+            emptyMap()
+        }
+    }
+
     suspend fun saveUserProfile(
         userId: String,
         email: String

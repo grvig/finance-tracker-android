@@ -41,6 +41,12 @@ class HouseholdViewModel(
         return repository.getHousehold(householdId)
     }
 
+    suspend fun getMemberEmails(
+        householdId: String
+    ): Map<String, String> {
+        return repository.getMemberEmails(householdId)
+    }
+
     suspend fun leaveHousehold(
         householdId: String,
         userId: String
