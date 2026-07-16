@@ -224,6 +224,16 @@ fun BudgetScreen(
             )
         }
 
+        Button(
+            onClick = {
+                refreshBudgets()
+                refreshExpenses()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Refresh")
+        }
+
         Text(
             text = "Saved Budgets",
             style = MaterialTheme.typography.headlineSmall
