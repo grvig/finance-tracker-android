@@ -244,6 +244,7 @@ class MainActivity : ComponentActivity() {
                     Screen.EXPENSE_LIST -> {
                         ExpenseListScreen(
                             expenseViewModel = expenseViewModel,
+                            householdViewModel = householdViewModel,
                             onAddExpenseClick = {
                                 currentScreen =
                                     Screen.ADD_EXPENSE

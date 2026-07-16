@@ -21,8 +21,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
+import com.grvig.financetracker.viewmodel.HouseholdViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -30,6 +32,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ExpenseListScreen(
     expenseViewModel: ExpenseViewModel,
+    householdViewModel: HouseholdViewModel,
     onAddExpenseClick: () -> Unit,
     onDashboardClick: () -> Unit,
     onEditExpenseClick: (Expense) -> Unit
@@ -80,6 +83,12 @@ fun ExpenseListScreen(
         mutableStateOf<Expense?>(null)
     }
 
+    var memberEmails by remember {
+        mutableStateOf<Map<String, String>>(emptyMap())
+    }
+
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
     val scope = rememberCoroutineScope()
 
     fun refreshExpenses() {
@@ -90,6 +99,9 @@ fun ExpenseListScreen(
 
     LaunchedEffect(Unit) {
         refreshExpenses()
+        memberEmails = householdViewModel.getMemberEmails(
+            SessionManager.currentHouseholdId
+        )
     }
 
     val searchedExpenses = if (searchQuery.isBlank()) {
@@ -288,10 +300,20 @@ fun ExpenseListScreen(
                         modifier = Modifier.padding(12.dp)
                     ) {
 
+                        val addedByLabel = when {
+                            expense.addedBy.isBlank() -> ""
+                            expense.addedBy == currentUserId -> "Added by You"
+                            else -> "Added by ${memberEmails[expense.addedBy] ?: "a member"}"
+                        }
+
                         Text("₹${expense.amount}")
                         Text(expense.category)
                         Text(expense.paymentMethod)
                         Text(expense.description)
+
+                        if (addedByLabel.isNotBlank()) {
+                            Text(addedByLabel)
+                        }
 
                         Button(
                             onClick = {
