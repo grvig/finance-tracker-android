@@ -40,12 +40,19 @@ fun HouseholdInfoScreen(
         mutableStateOf<String?>(null)
     }
 
+    var memberEmails by remember {
+        mutableStateOf<Map<String, String>>(emptyMap())
+    }
+
     val scope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
 
     LaunchedEffect(Unit) {
         scope.launch {
             household = householdViewModel.getHousehold(
+                SessionManager.currentHouseholdId
+            )
+            memberEmails = householdViewModel.getMemberEmails(
                 SessionManager.currentHouseholdId
             )
         }
@@ -80,6 +87,12 @@ fun HouseholdInfoScreen(
             Text(
                 text = "Members: ${current.memberIds.size}"
             )
+
+            current.memberIds.forEach { memberId ->
+                Text(
+                    text = "• ${memberEmails[memberId] ?: "Loading..."}"
+                )
+            }
 
             Button(
                 onClick = {
