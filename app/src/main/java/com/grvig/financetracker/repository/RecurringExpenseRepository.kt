@@ -1,5 +1,6 @@
 package com.grvig.financetracker.repository
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.grvig.financetracker.SessionManager
 import com.grvig.financetracker.data.RecurringExpense
@@ -22,7 +23,8 @@ class RecurringExpenseRepository {
         docRef.set(
             recurringExpense.copy(
                 id = docRef.id,
-                householdId = SessionManager.currentHouseholdId
+                householdId = SessionManager.currentHouseholdId,
+                addedBy = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             )
         ).await()
     }

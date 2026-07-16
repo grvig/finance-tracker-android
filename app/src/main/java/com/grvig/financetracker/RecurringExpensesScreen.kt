@@ -24,8 +24,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 import com.grvig.financetracker.data.RecurringExpense
 import com.grvig.financetracker.viewmodel.RecurringExpenseViewModel
+import com.grvig.financetracker.viewmodel.HouseholdViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -34,6 +36,7 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun RecurringExpensesScreen(
     recurringExpenseViewModel: RecurringExpenseViewModel,
+    householdViewModel: HouseholdViewModel,
     onDashboardClick: () -> Unit
 ) {
 
@@ -98,6 +101,12 @@ fun RecurringExpensesScreen(
         mutableStateOf<RecurringExpense?>(null)
     }
 
+    var memberEmails by remember {
+        mutableStateOf<Map<String, String>>(emptyMap())
+    }
+
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
     val snackbarHostState = remember {
         SnackbarHostState()
     }
@@ -113,6 +122,9 @@ fun RecurringExpensesScreen(
 
     LaunchedEffect(Unit) {
         refreshRecurringExpenses()
+        memberEmails = householdViewModel.getMemberEmails(
+            SessionManager.currentHouseholdId
+        )
     }
 
     Column(
@@ -430,6 +442,16 @@ fun RecurringExpensesScreen(
                         Text(
                             if (recurringExpense.isActive) "Active" else "Paused"
                         )
+
+                        val setUpByLabel = when {
+                            recurringExpense.addedBy.isBlank() -> ""
+                            recurringExpense.addedBy == currentUserId -> "Set up by You"
+                            else -> "Set up by ${memberEmails[recurringExpense.addedBy] ?: "a member"}"
+                        }
+
+                        if (setUpByLabel.isNotBlank()) {
+                            Text(setUpByLabel)
+                        }
 
                         Button(
                             onClick = {

@@ -289,6 +289,7 @@ class MainActivity : ComponentActivity() {
 
                         RecurringExpensesScreen(
                             recurringExpenseViewModel = recurringExpenseViewModel,
+                            householdViewModel = householdViewModel,
                             onDashboardClick = {
                                 currentScreen =
                                     Screen.DASHBOARD
