@@ -47,12 +47,16 @@ class RecurringExpenseRepository {
 
     suspend fun getAllRecurringExpenses():
             List<RecurringExpense> {
-        return recurringExpenses()
-            .get()
-            .await()
-            .documents
-            .mapNotNull {
-                it.toObject(RecurringExpense::class.java)
-            }
+        return try {
+            recurringExpenses()
+                .get()
+                .await()
+                .documents
+                .mapNotNull {
+                    it.toObject(RecurringExpense::class.java)
+                }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }

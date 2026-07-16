@@ -47,12 +47,16 @@ class ExpenseRepository {
 
     suspend fun getAllExpenses():
             List<Expense> {
-        return expenses()
-            .get()
-            .await()
-            .documents
-            .mapNotNull {
-                it.toObject(Expense::class.java)
-            }
+        return try {
+            expenses()
+                .get()
+                .await()
+                .documents
+                .mapNotNull {
+                    it.toObject(Expense::class.java)
+                }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }
