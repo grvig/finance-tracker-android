@@ -164,6 +164,17 @@ fun ExpenseListScreen(
             Text("Add New Expense")
         }
 
+        Button(
+            onClick = {
+                refreshExpenses()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Text("Refresh")
+        }
+
         OutlinedTextField(
             value = searchQuery,
             onValueChange = {
