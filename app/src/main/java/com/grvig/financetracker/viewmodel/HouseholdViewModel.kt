@@ -15,6 +15,13 @@ class HouseholdViewModel(
         return repository.getUserProfile(userId)
     }
 
+    suspend fun saveUserProfile(
+        userId: String,
+        email: String
+    ) {
+        repository.saveUserProfile(userId, email)
+    }
+
     suspend fun createHousehold(
         userId: String
     ): Result<Household> {

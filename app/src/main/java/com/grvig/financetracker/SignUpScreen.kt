@@ -16,11 +16,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.viewmodel.AuthViewModel
+import com.grvig.financetracker.viewmodel.HouseholdViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpScreen(
     authViewModel: AuthViewModel,
+    householdViewModel: HouseholdViewModel,
     onSignUpSuccess: () -> Unit,
     onLoginClick: () -> Unit
 ) {
@@ -112,13 +114,17 @@ fun SignUpScreen(
                         password
                     )
 
-                    isLoading = false
-
-                    result.onSuccess {
+                    result.onSuccess { user ->
+                        householdViewModel.saveUserProfile(
+                            user.uid,
+                            email
+                        )
+                        isLoading = false
                         onSignUpSuccess()
                     }
 
                     result.onFailure {
+                        isLoading = false
                         errorMessage = it.message ?: "Sign up failed"
                     }
                 }

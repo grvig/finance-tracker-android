@@ -165,6 +165,7 @@ class MainActivity : ComponentActivity() {
 
                         SignUpScreen(
                             authViewModel = authViewModel,
+                            householdViewModel = householdViewModel,
                             onSignUpSuccess = {
                                 currentScreen =
                                     Screen.HOUSEHOLD_SETUP

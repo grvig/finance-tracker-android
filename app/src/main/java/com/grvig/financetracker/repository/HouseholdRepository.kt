@@ -85,10 +85,7 @@ class HouseholdRepository {
 
             users.document(userId)
                 .set(
-                    UserProfile(
-                        uid = userId,
-                        householdId = ""
-                    ),
+                    mapOf("householdId" to ""),
                     SetOptions.merge()
                 )
                 .await()
@@ -121,16 +118,30 @@ class HouseholdRepository {
         }
     }
 
+    suspend fun saveUserProfile(
+        userId: String,
+        email: String
+    ) {
+        try {
+            users.document(userId)
+                .set(
+                    UserProfile(
+                        uid = userId,
+                        email = email
+                    )
+                )
+                .await()
+        } catch (e: Exception) {
+        }
+    }
+
     private suspend fun linkUserToHousehold(
         userId: String,
         householdId: String
     ) {
         users.document(userId)
             .set(
-                UserProfile(
-                    uid = userId,
-                    householdId = householdId
-                ),
+                mapOf("householdId" to householdId),
                 SetOptions.merge()
             )
             .await()
