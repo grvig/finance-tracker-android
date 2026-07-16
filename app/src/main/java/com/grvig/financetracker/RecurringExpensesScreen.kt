@@ -393,6 +393,15 @@ fun RecurringExpensesScreen(
             )
         }
 
+        Button(
+            onClick = {
+                refreshRecurringExpenses()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Refresh")
+        }
+
         Text(
             text = "Saved Recurring Expenses",
             style = MaterialTheme.typography.headlineSmall
