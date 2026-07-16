@@ -12,9 +12,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import android.content.ClipData
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Household
 import com.grvig.financetracker.viewmodel.HouseholdViewModel
@@ -45,7 +46,7 @@ fun HouseholdInfoScreen(
     }
 
     val scope = rememberCoroutineScope()
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
 
     LaunchedEffect(Unit) {
         scope.launch {
@@ -96,9 +97,16 @@ fun HouseholdInfoScreen(
 
             Button(
                 onClick = {
-                    clipboardManager.setText(
-                        AnnotatedString(current.code)
-                    )
+                    scope.launch {
+                        clipboard.setClipEntry(
+                            ClipEntry(
+                                ClipData.newPlainText(
+                                    "Household Code",
+                                    current.code
+                                )
+                            )
+                        )
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
