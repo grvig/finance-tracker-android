@@ -194,6 +194,7 @@ class MainActivity : ComponentActivity() {
                             expenseViewModel = expenseViewModel,
                             budgetViewModel = budgetViewModel,
                             recurringExpenseViewModel = recurringExpenseViewModel,
+                            householdViewModel = householdViewModel,
                             onAddExpenseClick = {
                                 currentScreen =
                                     Screen.ADD_EXPENSE

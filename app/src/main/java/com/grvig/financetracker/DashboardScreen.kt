@@ -33,6 +33,7 @@ import com.grvig.financetracker.data.Budget
 import com.grvig.financetracker.viewmodel.BudgetViewModel
 import com.grvig.financetracker.data.RecurringExpense
 import com.grvig.financetracker.viewmodel.RecurringExpenseViewModel
+import com.grvig.financetracker.viewmodel.HouseholdViewModel
 
 private fun nextDueDateAfter(
     currentDueDate: String,
@@ -182,6 +183,7 @@ fun DashboardScreen(
 expenseViewModel: ExpenseViewModel,
 budgetViewModel: BudgetViewModel,
 recurringExpenseViewModel: RecurringExpenseViewModel,
+householdViewModel: HouseholdViewModel,
 onAddExpenseClick: () -> Unit,
 onViewExpensesClick: () -> Unit,
 onBudgetClick: () -> Unit,
@@ -199,6 +201,9 @@ onSignOutClick: () -> Unit
     }
     var recurringExpenses by remember {
         mutableStateOf<List<RecurringExpense>>(emptyList())
+    }
+    var memberCount by remember {
+        mutableStateOf(0)
     }
 
     val scope = rememberCoroutineScope()
@@ -245,6 +250,9 @@ onSignOutClick: () -> Unit
             budgets = budgetViewModel.getAllBudgets()
             recurringExpenses =
                 recurringExpenseViewModel.getAllRecurringExpenses()
+            memberCount = householdViewModel.getHousehold(
+                SessionManager.currentHouseholdId
+            )?.memberIds?.size ?: 0
         }
     }
 
@@ -372,6 +380,12 @@ onSignOutClick: () -> Unit
             text = "Dashboard",
             style = MaterialTheme.typography.headlineMedium
         )
+
+        if (memberCount > 0) {
+            Text(
+                text = "Shared with $memberCount member${if (memberCount == 1) "" else "s"}"
+            )
+        }
 
         Card(
             modifier = Modifier.fillMaxWidth()
