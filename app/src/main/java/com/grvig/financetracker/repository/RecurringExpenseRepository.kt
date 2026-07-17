@@ -18,31 +18,40 @@ class RecurringExpenseRepository {
     suspend fun insertRecurringExpense(
         recurringExpense: RecurringExpense
     ) {
-        val docRef = recurringExpenses().document()
+        try {
+            val docRef = recurringExpenses().document()
 
-        docRef.set(
-            recurringExpense.copy(
-                id = docRef.id,
-                householdId = SessionManager.currentHouseholdId,
-                addedBy = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-            )
-        ).await()
+            docRef.set(
+                recurringExpense.copy(
+                    id = docRef.id,
+                    householdId = SessionManager.currentHouseholdId,
+                    addedBy = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                )
+            ).await()
+        } catch (e: Exception) {
+        }
     }
 
     suspend fun updateRecurringExpense(
         recurringExpense: RecurringExpense
     ) {
-        recurringExpenses().document(recurringExpense.id)
-            .set(recurringExpense)
-            .await()
+        try {
+            recurringExpenses().document(recurringExpense.id)
+                .set(recurringExpense)
+                .await()
+        } catch (e: Exception) {
+        }
     }
 
     suspend fun deleteRecurringExpense(
         recurringExpense: RecurringExpense
     ) {
-        recurringExpenses().document(recurringExpense.id)
-            .delete()
-            .await()
+        try {
+            recurringExpenses().document(recurringExpense.id)
+                .delete()
+                .await()
+        } catch (e: Exception) {
+        }
     }
 
     suspend fun getAllRecurringExpenses():
