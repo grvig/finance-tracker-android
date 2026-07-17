@@ -18,31 +18,40 @@ class ExpenseRepository {
     suspend fun insertExpense(
         expense: Expense
     ) {
-        val docRef = expenses().document()
+        try {
+            val docRef = expenses().document()
 
-        docRef.set(
-            expense.copy(
-                id = docRef.id,
-                householdId = SessionManager.currentHouseholdId,
-                addedBy = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-            )
-        ).await()
+            docRef.set(
+                expense.copy(
+                    id = docRef.id,
+                    householdId = SessionManager.currentHouseholdId,
+                    addedBy = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                )
+            ).await()
+        } catch (e: Exception) {
+        }
     }
 
     suspend fun updateExpense(
         expense: Expense
     ) {
-        expenses().document(expense.id)
-            .set(expense)
-            .await()
+        try {
+            expenses().document(expense.id)
+                .set(expense)
+                .await()
+        } catch (e: Exception) {
+        }
     }
 
     suspend fun deleteExpense(
         expense: Expense
     ) {
-        expenses().document(expense.id)
-            .delete()
-            .await()
+        try {
+            expenses().document(expense.id)
+                .delete()
+                .await()
+        } catch (e: Exception) {
+        }
     }
 
     suspend fun getAllExpenses():
