@@ -414,9 +414,13 @@ fun RecurringExpensesScreen(
             )
         }
 
+        val sortedRecurringExpenses = recurringExpenses.sortedBy {
+            it.nextDueDate
+        }
+
         LazyColumn {
 
-            items(recurringExpenses) { recurringExpense ->
+            items(sortedRecurringExpenses) { recurringExpense ->
 
                 Card(
                     modifier = Modifier
