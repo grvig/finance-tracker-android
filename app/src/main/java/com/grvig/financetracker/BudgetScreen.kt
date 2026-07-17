@@ -7,6 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
@@ -26,6 +32,7 @@ import androidx.compose.material3.Card
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetScreen(
     budgetViewModel: BudgetViewModel,
@@ -33,8 +40,21 @@ fun BudgetScreen(
 ) {
 
     var category by remember {
-        mutableStateOf("")
+        mutableStateOf("Food")
     }
+
+    var categoryExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    val categories = listOf(
+        "Food",
+        "Transport",
+        "Shopping",
+        "Bills",
+        "Health",
+        "Entertainment"
+    )
 
     var monthlyLimit by remember {
         mutableStateOf("")
@@ -110,16 +130,53 @@ fun BudgetScreen(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        OutlinedTextField(
-            value = category,
-            onValueChange = {
-                category = it
-            },
-            label = {
-                Text("Category")
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
+        ExposedDropdownMenuBox(
+            expanded = categoryExpanded,
+            onExpandedChange = {
+                categoryExpanded = it
+            }
+        ) {
+
+            OutlinedTextField(
+                value = category,
+                onValueChange = {},
+                readOnly = true,
+                label = {
+                    Text("Category")
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = categoryExpanded
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor(
+                        ExposedDropdownMenuAnchorType.PrimaryNotEditable
+                    )
+                    .fillMaxWidth()
+            )
+
+            DropdownMenu(
+                expanded = categoryExpanded,
+                onDismissRequest = {
+                    categoryExpanded = false
+                }
+            ) {
+
+                categories.forEach { item ->
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(item)
+                        },
+                        onClick = {
+                            category = item
+                            categoryExpanded = false
+                        }
+                    )
+                }
+            }
+        }
 
         OutlinedTextField(
             value = monthlyLimit,
@@ -201,7 +258,7 @@ fun BudgetScreen(
                         budget.toString()
                     )
 
-                    category = ""
+                    category = "Food"
                     monthlyLimit = ""
                     warningPercent = ""
                     editingBudget = null
