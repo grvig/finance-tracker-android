@@ -17,30 +17,39 @@ class BudgetRepository {
     suspend fun insertBudget(
         budget: Budget
     ) {
-        val docRef = budgets().document()
+        try {
+            val docRef = budgets().document()
 
-        docRef.set(
-            budget.copy(
-                id = docRef.id,
-                householdId = SessionManager.currentHouseholdId
-            )
-        ).await()
+            docRef.set(
+                budget.copy(
+                    id = docRef.id,
+                    householdId = SessionManager.currentHouseholdId
+                )
+            ).await()
+        } catch (e: Exception) {
+        }
     }
 
     suspend fun updateBudget(
         budget: Budget
     ) {
-        budgets().document(budget.id)
-            .set(budget)
-            .await()
+        try {
+            budgets().document(budget.id)
+                .set(budget)
+                .await()
+        } catch (e: Exception) {
+        }
     }
 
     suspend fun deleteBudget(
         budget: Budget
     ) {
-        budgets().document(budget.id)
-            .delete()
-            .await()
+        try {
+            budgets().document(budget.id)
+                .delete()
+                .await()
+        } catch (e: Exception) {
+        }
     }
 
     suspend fun getAllBudgets():
