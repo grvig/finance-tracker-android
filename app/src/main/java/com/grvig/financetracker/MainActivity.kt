@@ -3,6 +3,7 @@ package com.grvig.financetracker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModelProvider
 import com.grvig.financetracker.data.Expense
@@ -97,8 +98,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             FinanceTrackerTheme {
 
-                var currentScreen by remember {
-                    mutableStateOf(
+                val backStack = remember {
+                    mutableStateListOf(
                         if (authViewModel.currentUser != null)
                             Screen.LOADING
                         else
@@ -106,11 +107,32 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
+                val currentScreen = backStack.last()
+
                 var selectedExpense by remember {
                     mutableStateOf<Expense?>(null)
                 }
 
                 val scope = rememberCoroutineScope()
+
+                fun navigateTo(screen: Screen) {
+                    backStack.add(screen)
+                }
+
+                fun goBack() {
+                    if (backStack.size > 1) {
+                        backStack.removeAt(backStack.size - 1)
+                    }
+                }
+
+                fun resetTo(screen: Screen) {
+                    backStack.clear()
+                    backStack.add(screen)
+                }
+
+                BackHandler(enabled = backStack.size > 1) {
+                    goBack()
+                }
 
                 when (currentScreen) {
 
@@ -128,10 +150,12 @@ class MainActivity : ComponentActivity() {
                                 SessionManager.currentHouseholdId =
                                     profile?.householdId ?: ""
 
-                                currentScreen = if (SessionManager.currentHouseholdId.isBlank())
-                                    Screen.HOUSEHOLD_SETUP
-                                else
-                                    Screen.DASHBOARD
+                                resetTo(
+                                    if (SessionManager.currentHouseholdId.isBlank())
+                                        Screen.HOUSEHOLD_SETUP
+                                    else
+                                        Screen.DASHBOARD
+                                )
                             }
                         }
 
@@ -149,14 +173,15 @@ class MainActivity : ComponentActivity() {
                             authViewModel = authViewModel,
                             householdViewModel = householdViewModel,
                             onLoginSuccess = { hasHousehold ->
-                                currentScreen = if (hasHousehold)
-                                    Screen.DASHBOARD
-                                else
-                                    Screen.HOUSEHOLD_SETUP
+                                resetTo(
+                                    if (hasHousehold)
+                                        Screen.DASHBOARD
+                                    else
+                                        Screen.HOUSEHOLD_SETUP
+                                )
                             },
                             onSignUpClick = {
-                                currentScreen =
-                                    Screen.SIGNUP
+                                navigateTo(Screen.SIGNUP)
                             }
                         )
                     }
@@ -167,12 +192,10 @@ class MainActivity : ComponentActivity() {
                             authViewModel = authViewModel,
                             householdViewModel = householdViewModel,
                             onSignUpSuccess = {
-                                currentScreen =
-                                    Screen.HOUSEHOLD_SETUP
+                                resetTo(Screen.HOUSEHOLD_SETUP)
                             },
                             onLoginClick = {
-                                currentScreen =
-                                    Screen.LOGIN
+                                goBack()
                             }
                         )
                     }
@@ -183,8 +206,7 @@ class MainActivity : ComponentActivity() {
                             householdViewModel = householdViewModel,
                             userId = authViewModel.currentUser?.uid ?: "",
                             onHouseholdReady = {
-                                currentScreen =
-                                    Screen.DASHBOARD
+                                resetTo(Screen.DASHBOARD)
                             }
                         )
                     }
@@ -196,34 +218,27 @@ class MainActivity : ComponentActivity() {
                             recurringExpenseViewModel = recurringExpenseViewModel,
                             householdViewModel = householdViewModel,
                             onAddExpenseClick = {
-                                currentScreen =
-                                    Screen.ADD_EXPENSE
+                                navigateTo(Screen.ADD_EXPENSE)
                             },
                             onViewExpensesClick = {
-                                currentScreen =
-                                    Screen.EXPENSE_LIST
+                                navigateTo(Screen.EXPENSE_LIST)
                             },
                             onBudgetClick = {
-                                currentScreen =
-                                    Screen.BUDGET
+                                navigateTo(Screen.BUDGET)
                             },
                             onRecurringExpensesClick = {
-                                currentScreen =
-                                    Screen.RECURRING_EXPENSES
+                                navigateTo(Screen.RECURRING_EXPENSES)
                             },
                             onReportsClick = {
-                                currentScreen =
-                                    Screen.REPORTS
+                                navigateTo(Screen.REPORTS)
                             },
                             onHouseholdClick = {
-                                currentScreen =
-                                    Screen.HOUSEHOLD_INFO
+                                navigateTo(Screen.HOUSEHOLD_INFO)
                             },
                             onSignOutClick = {
                                 authViewModel.signOut()
                                 SessionManager.currentHouseholdId = ""
-                                currentScreen =
-                                    Screen.LOGIN
+                                resetTo(Screen.LOGIN)
                             }
                         )
                     }
@@ -232,12 +247,10 @@ class MainActivity : ComponentActivity() {
                         AddExpenseScreen(
                             expenseViewModel = expenseViewModel,
                             onViewExpensesClick = {
-                                currentScreen =
-                                    Screen.EXPENSE_LIST
+                                navigateTo(Screen.EXPENSE_LIST)
                             },
                             onDashboardClick = {
-                                currentScreen =
-                                    Screen.DASHBOARD
+                                resetTo(Screen.DASHBOARD)
                             }
                         )
                     }
@@ -247,19 +260,16 @@ class MainActivity : ComponentActivity() {
                             expenseViewModel = expenseViewModel,
                             householdViewModel = householdViewModel,
                             onAddExpenseClick = {
-                                currentScreen =
-                                    Screen.ADD_EXPENSE
+                                navigateTo(Screen.ADD_EXPENSE)
                             },
                             onDashboardClick = {
-                                currentScreen =
-                                    Screen.DASHBOARD
+                                resetTo(Screen.DASHBOARD)
                             },
                             onEditExpenseClick = { expense ->
 
                                 selectedExpense = expense
 
-                                currentScreen =
-                                    Screen.EDIT_EXPENSE
+                                navigateTo(Screen.EDIT_EXPENSE)
                             }
                         )
                     }
@@ -272,8 +282,7 @@ class MainActivity : ComponentActivity() {
                                 expense = expense,
                                 expenseViewModel = expenseViewModel,
                                 onSaveClick = {
-                                    currentScreen =
-                                        Screen.EXPENSE_LIST
+                                    goBack()
                                 }
                             )
                         }
@@ -292,8 +301,7 @@ class MainActivity : ComponentActivity() {
                             recurringExpenseViewModel = recurringExpenseViewModel,
                             householdViewModel = householdViewModel,
                             onDashboardClick = {
-                                currentScreen =
-                                    Screen.DASHBOARD
+                                resetTo(Screen.DASHBOARD)
                             }
                         )
                     }
@@ -304,8 +312,7 @@ class MainActivity : ComponentActivity() {
                             expenseViewModel = expenseViewModel,
                             budgetViewModel = budgetViewModel,
                             onDashboardClick = {
-                                currentScreen =
-                                    Screen.DASHBOARD
+                                resetTo(Screen.DASHBOARD)
                             }
                         )
                     }
@@ -316,12 +323,10 @@ class MainActivity : ComponentActivity() {
                             householdViewModel = householdViewModel,
                             userId = authViewModel.currentUser?.uid ?: "",
                             onDashboardClick = {
-                                currentScreen =
-                                    Screen.DASHBOARD
+                                resetTo(Screen.DASHBOARD)
                             },
                             onLeaveHousehold = {
-                                currentScreen =
-                                    Screen.HOUSEHOLD_SETUP
+                                resetTo(Screen.HOUSEHOLD_SETUP)
                             }
                         )
                     }
