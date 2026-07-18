@@ -21,10 +21,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 import com.grvig.financetracker.data.Budget
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.BudgetViewModel
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
+import com.grvig.financetracker.viewmodel.HouseholdViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -33,6 +35,7 @@ import java.time.LocalDate
 fun ReportsScreen(
     expenseViewModel: ExpenseViewModel,
     budgetViewModel: BudgetViewModel,
+    householdViewModel: HouseholdViewModel,
     onDashboardClick: () -> Unit
 ) {
 
@@ -43,6 +46,12 @@ fun ReportsScreen(
     var budgets by remember {
         mutableStateOf<List<Budget>>(emptyList())
     }
+
+    var memberEmails by remember {
+        mutableStateOf<Map<String, String>>(emptyMap())
+    }
+
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
     val months = (0..11).map { monthsAgo ->
         LocalDate.now()
@@ -65,6 +74,9 @@ fun ReportsScreen(
         scope.launch {
             expenses = expenseViewModel.getAllExpenses()
             budgets = budgetViewModel.getAllBudgets()
+            memberEmails = householdViewModel.getMemberEmails(
+                SessionManager.currentHouseholdId
+            )
         }
     }
 
@@ -97,6 +109,20 @@ fun ReportsScreen(
     val categoryBreakdown = monthExpenses
         .groupBy {
             it.category
+        }
+        .mapValues { entry ->
+            entry.value.sumOf {
+                it.amount
+            }
+        }
+        .toList()
+        .sortedByDescending {
+            it.second
+        }
+
+    val memberBreakdown = monthExpenses
+        .groupBy {
+            it.addedBy
         }
         .mapValues { entry ->
             entry.value.sumOf {
@@ -221,6 +247,31 @@ fun ReportsScreen(
                         }
 
                         Text("$category: ₹$amount ($percent%)")
+                    }
+                }
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+
+                    Text(
+                        text = "Per-Member Spending",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    memberBreakdown.forEach { (memberId, amount) ->
+
+                        val label = when {
+                            memberId.isBlank() -> "Unknown"
+                            memberId == currentUserId -> "You"
+                            else -> memberEmails[memberId] ?: "a member"
+                        }
+
+                        Text("$label: ₹$amount")
                     }
                 }
             }
