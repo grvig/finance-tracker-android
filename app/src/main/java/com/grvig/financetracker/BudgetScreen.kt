@@ -36,7 +36,8 @@ import java.time.LocalDate
 @Composable
 fun BudgetScreen(
     budgetViewModel: BudgetViewModel,
-    expenseViewModel: ExpenseViewModel
+    expenseViewModel: ExpenseViewModel,
+    onDashboardClick: () -> Unit
 ) {
 
     var category by remember {
@@ -129,6 +130,13 @@ fun BudgetScreen(
             text = "Budget Tracking",
             style = MaterialTheme.typography.headlineMedium
         )
+
+        Button(
+            onClick = onDashboardClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Back To Dashboard")
+        }
 
         ExposedDropdownMenuBox(
             expanded = categoryExpanded,

@@ -291,7 +291,10 @@ class MainActivity : ComponentActivity() {
 
                         BudgetScreen(
                             budgetViewModel = budgetViewModel,
-                            expenseViewModel = expenseViewModel
+                            expenseViewModel = expenseViewModel,
+                            onDashboardClick = {
+                                resetTo(Screen.DASHBOARD)
+                            }
                         )
                     }
 
