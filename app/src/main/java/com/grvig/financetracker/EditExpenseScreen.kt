@@ -16,7 +16,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -38,7 +37,8 @@ import java.time.ZoneOffset
 fun EditExpenseScreen(
     expense: Expense,
     expenseViewModel: ExpenseViewModel,
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
+    onBack: () -> Unit
 ) {
 
     var amount by remember {
@@ -105,18 +105,19 @@ fun EditExpenseScreen(
 
     val scope = rememberCoroutineScope()
 
+    AppScaffold(
+        title = "Edit Expense",
+        onBack = onBack
+    ) { innerPadding ->
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        Text(
-            text = "Edit Expense",
-            style = MaterialTheme.typography.headlineMedium
-        )
 
         OutlinedTextField(
             value = amount,
@@ -334,5 +335,6 @@ fun EditExpenseScreen(
         SnackbarHost(
             hostState = snackbarHostState
         )
+    }
     }
 }

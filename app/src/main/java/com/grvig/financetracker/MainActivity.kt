@@ -283,6 +283,9 @@ class MainActivity : ComponentActivity() {
                                 expenseViewModel = expenseViewModel,
                                 onSaveClick = {
                                     goBack()
+                                },
+                                onBack = {
+                                    goBack()
                                 }
                             )
                         }
