@@ -262,8 +262,8 @@ class MainActivity : ComponentActivity() {
                             onAddExpenseClick = {
                                 navigateTo(Screen.ADD_EXPENSE)
                             },
-                            onDashboardClick = {
-                                resetTo(Screen.DASHBOARD)
+                            onBack = {
+                                goBack()
                             },
                             onEditExpenseClick = { expense ->
 

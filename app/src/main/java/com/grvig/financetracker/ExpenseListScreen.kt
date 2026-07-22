@@ -15,7 +15,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -34,7 +33,7 @@ fun ExpenseListScreen(
     expenseViewModel: ExpenseViewModel,
     householdViewModel: HouseholdViewModel,
     onAddExpenseClick: () -> Unit,
-    onDashboardClick: () -> Unit,
+    onBack: () -> Unit,
     onEditExpenseClick: (Expense) -> Unit
 ) {
 
@@ -136,24 +135,16 @@ fun ExpenseListScreen(
         }
     }
 
+    AppScaffold(
+        title = "Expense List",
+        onBack = onBack
+    ) { innerPadding ->
+
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
     ) {
-
-        Text(
-            text = "Expense List",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        Button(
-            onClick = onDashboardClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text("Back To Dashboard")
-        }
 
         Button(
             onClick = onAddExpenseClick,
@@ -394,5 +385,6 @@ fun ExpenseListScreen(
                 }
             )
         }
+    }
     }
 }
