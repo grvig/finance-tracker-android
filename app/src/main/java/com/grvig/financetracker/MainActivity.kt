@@ -223,6 +223,9 @@ class MainActivity : ComponentActivity() {
                             onViewExpensesClick = {
                                 navigateTo(Screen.EXPENSE_LIST)
                             },
+                            onMyExpensesClick = {
+                                navigateTo(Screen.MY_EXPENSES)
+                            },
                             onBudgetClick = {
                                 navigateTo(Screen.BUDGET)
                             },
@@ -318,6 +321,16 @@ class MainActivity : ComponentActivity() {
                             expenseViewModel = expenseViewModel,
                             budgetViewModel = budgetViewModel,
                             householdViewModel = householdViewModel,
+                            onBack = {
+                                goBack()
+                            }
+                        )
+                    }
+
+                    Screen.MY_EXPENSES -> {
+
+                        MyExpensesScreen(
+                            expenseViewModel = expenseViewModel,
                             onBack = {
                                 goBack()
                             }

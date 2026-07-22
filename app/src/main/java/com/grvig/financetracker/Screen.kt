@@ -12,5 +12,6 @@ enum class Screen {
     BUDGET,
     RECURRING_EXPENSES,
     REPORTS,
-    HOUSEHOLD_INFO
+    HOUSEHOLD_INFO,
+    MY_EXPENSES
 }

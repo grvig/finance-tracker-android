@@ -186,6 +186,7 @@ recurringExpenseViewModel: RecurringExpenseViewModel,
 householdViewModel: HouseholdViewModel,
 onAddExpenseClick: () -> Unit,
 onViewExpensesClick: () -> Unit,
+onMyExpensesClick: () -> Unit,
 onBudgetClick: () -> Unit,
 onRecurringExpensesClick: () -> Unit,
 onReportsClick: () -> Unit,
@@ -494,6 +495,13 @@ onSignOutClick: () -> Unit
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("View Expenses")
+        }
+
+        Button(
+            onClick = onMyExpensesClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("My Expenses")
         }
         Button(
             onClick = onBudgetClick,
