@@ -329,8 +329,8 @@ class MainActivity : ComponentActivity() {
                         HouseholdInfoScreen(
                             householdViewModel = householdViewModel,
                             userId = authViewModel.currentUser?.uid ?: "",
-                            onDashboardClick = {
-                                resetTo(Screen.DASHBOARD)
+                            onBack = {
+                                goBack()
                             },
                             onLeaveHousehold = {
                                 resetTo(Screen.HOUSEHOLD_SETUP)

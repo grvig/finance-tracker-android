@@ -9,7 +9,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import android.content.ClipData
@@ -25,7 +24,7 @@ import kotlinx.coroutines.launch
 fun HouseholdInfoScreen(
     householdViewModel: HouseholdViewModel,
     userId: String,
-    onDashboardClick: () -> Unit,
+    onBack: () -> Unit,
     onLeaveHousehold: () -> Unit
 ) {
 
@@ -59,25 +58,19 @@ fun HouseholdInfoScreen(
         }
     }
 
+    AppScaffold(
+        title = "Household",
+        onBack = onBack
+    ) { innerPadding ->
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        Text(
-            text = "Household",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Button(
-            onClick = onDashboardClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Back To Dashboard")
-        }
 
         household?.let { current ->
 
@@ -177,5 +170,6 @@ fun HouseholdInfoScreen(
                 }
             )
         }
+    }
     }
 }
