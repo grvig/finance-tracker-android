@@ -37,7 +37,7 @@ import java.time.temporal.ChronoUnit
 fun RecurringExpensesScreen(
     recurringExpenseViewModel: RecurringExpenseViewModel,
     householdViewModel: HouseholdViewModel,
-    onDashboardClick: () -> Unit
+    onBack: () -> Unit
 ) {
 
     var title by remember { mutableStateOf("") }
@@ -127,24 +127,18 @@ fun RecurringExpensesScreen(
         )
     }
 
+    AppScaffold(
+        title = "Recurring Expenses",
+        onBack = onBack
+    ) { innerPadding ->
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        Text(
-            text = "Recurring Expenses",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Button(
-            onClick = onDashboardClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Back To Dashboard")
-        }
 
         OutlinedTextField(
             value = title,
@@ -567,5 +561,6 @@ fun RecurringExpensesScreen(
         SnackbarHost(
             hostState = snackbarHostState
         )
+    }
     }
 }
