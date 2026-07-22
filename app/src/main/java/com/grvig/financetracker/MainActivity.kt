@@ -295,8 +295,8 @@ class MainActivity : ComponentActivity() {
                         BudgetScreen(
                             budgetViewModel = budgetViewModel,
                             expenseViewModel = expenseViewModel,
-                            onDashboardClick = {
-                                resetTo(Screen.DASHBOARD)
+                            onBack = {
+                                goBack()
                             }
                         )
                     }

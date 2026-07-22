@@ -37,7 +37,7 @@ import java.time.LocalDate
 fun BudgetScreen(
     budgetViewModel: BudgetViewModel,
     expenseViewModel: ExpenseViewModel,
-    onDashboardClick: () -> Unit
+    onBack: () -> Unit
 ) {
 
     var category by remember {
@@ -119,24 +119,18 @@ fun BudgetScreen(
             }
     }
 
+    AppScaffold(
+        title = "Budget Tracking",
+        onBack = onBack
+    ) { innerPadding ->
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        Text(
-            text = "Budget Tracking",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Button(
-            onClick = onDashboardClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Back To Dashboard")
-        }
 
         ExposedDropdownMenuBox(
             expanded = categoryExpanded,
@@ -428,5 +422,6 @@ fun BudgetScreen(
         SnackbarHost(
             hostState = snackbarHostState
         )
+    }
     }
 }
