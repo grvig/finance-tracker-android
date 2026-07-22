@@ -249,8 +249,8 @@ class MainActivity : ComponentActivity() {
                             onViewExpensesClick = {
                                 navigateTo(Screen.EXPENSE_LIST)
                             },
-                            onDashboardClick = {
-                                resetTo(Screen.DASHBOARD)
+                            onBack = {
+                                goBack()
                             }
                         )
                     }

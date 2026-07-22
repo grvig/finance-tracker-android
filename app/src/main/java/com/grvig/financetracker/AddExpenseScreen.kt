@@ -16,7 +16,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -39,7 +38,7 @@ import java.time.ZoneOffset
 fun AddExpenseScreen(
     expenseViewModel: ExpenseViewModel,
     onViewExpensesClick: () -> Unit,
-    onDashboardClick: () -> Unit
+    onBack: () -> Unit
 ) {
 
     var amount by remember { mutableStateOf("") }
@@ -93,25 +92,19 @@ fun AddExpenseScreen(
 
     val scope = rememberCoroutineScope()
 
+    AppScaffold(
+        title = "Add Expense",
+        onBack = onBack
+    ) { innerPadding ->
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        Text(
-            text = "Add Expense",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Button(
-            onClick = onDashboardClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Back To Dashboard")
-        }
 
         Button(
             onClick = onViewExpensesClick,
@@ -337,5 +330,6 @@ fun AddExpenseScreen(
         SnackbarHost(
             hostState = snackbarHostState
         )
+    }
     }
 }
