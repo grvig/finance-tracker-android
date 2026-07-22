@@ -368,18 +368,18 @@ onSignOutClick: () -> Unit
         month.substring(5, 7) to spent
     }
 
+    AppScaffold(
+        title = "Dashboard"
+    ) { innerPadding ->
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        Text(
-            text = "Dashboard",
-            style = MaterialTheme.typography.headlineMedium
-        )
 
         if (memberCount > 0) {
             Text(
@@ -529,5 +529,6 @@ onSignOutClick: () -> Unit
         ) {
             Text("Sign Out")
         }
+    }
     }
 }
