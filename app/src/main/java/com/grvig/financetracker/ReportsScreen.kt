@@ -36,7 +36,7 @@ fun ReportsScreen(
     expenseViewModel: ExpenseViewModel,
     budgetViewModel: BudgetViewModel,
     householdViewModel: HouseholdViewModel,
-    onDashboardClick: () -> Unit
+    onBack: () -> Unit
 ) {
 
     var expenses by remember {
@@ -134,25 +134,19 @@ fun ReportsScreen(
             it.second
         }
 
+    AppScaffold(
+        title = "Reports",
+        onBack = onBack
+    ) { innerPadding ->
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        Text(
-            text = "Reports",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Button(
-            onClick = onDashboardClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Back To Dashboard")
-        }
 
         ExposedDropdownMenuBox(
             expanded = monthExpanded,
@@ -276,5 +270,6 @@ fun ReportsScreen(
                 }
             }
         }
+    }
     }
 }

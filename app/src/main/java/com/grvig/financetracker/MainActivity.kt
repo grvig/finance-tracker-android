@@ -318,8 +318,8 @@ class MainActivity : ComponentActivity() {
                             expenseViewModel = expenseViewModel,
                             budgetViewModel = budgetViewModel,
                             householdViewModel = householdViewModel,
-                            onDashboardClick = {
-                                resetTo(Screen.DASHBOARD)
+                            onBack = {
+                                goBack()
                             }
                         )
                     }
