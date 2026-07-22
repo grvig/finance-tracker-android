@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -34,17 +33,17 @@ fun LoginScreen(
 
     val scope = rememberCoroutineScope()
 
+    AppScaffold(
+        title = "Login"
+    ) { innerPadding ->
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        Text(
-            text = "Login",
-            style = MaterialTheme.typography.headlineMedium
-        )
 
         OutlinedTextField(
             value = email,
@@ -127,5 +126,6 @@ fun LoginScreen(
         ) {
             Text("Don't have an account? Sign Up")
         }
+    }
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -31,18 +30,18 @@ fun HouseholdSetupScreen(
 
     val scope = rememberCoroutineScope()
 
+    AppScaffold(
+        title = "Set Up Household"
+    ) { innerPadding ->
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        Text(
-            text = "Set Up Household",
-            style = MaterialTheme.typography.headlineMedium
-        )
 
         Text(
             text = "Create a new household or join an existing one with a code."
@@ -149,5 +148,6 @@ fun HouseholdSetupScreen(
         errorMessage?.let {
             Text(text = it)
         }
+    }
     }
 }
