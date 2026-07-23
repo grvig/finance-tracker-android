@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
+import com.grvig.financetracker.viewmodel.HouseholdViewModel
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -37,6 +38,7 @@ import java.time.ZoneOffset
 @Composable
 fun AddExpenseScreen(
     expenseViewModel: ExpenseViewModel,
+    householdViewModel: HouseholdViewModel,
     onViewExpensesClick: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -44,7 +46,7 @@ fun AddExpenseScreen(
     var amount by remember { mutableStateOf("") }
 
     var category by remember {
-        mutableStateOf("Food")
+        mutableStateOf("")
     }
 
     var paymentMethod by remember {
@@ -70,14 +72,18 @@ fun AddExpenseScreen(
         mutableStateOf(false)
     }
 
-    val categories = listOf(
-        "Food",
-        "Transport",
-        "Shopping",
-        "Bills",
-        "Health",
-        "Entertainment"
-    )
+    var categories by remember {
+        mutableStateOf<List<String>>(emptyList())
+    }
+
+    LaunchedEffect(Unit) {
+        categories = householdViewModel.getCategories(
+            SessionManager.currentHouseholdId
+        )
+        if (category.isBlank()) {
+            category = categories.firstOrNull() ?: ""
+        }
+    }
 
     val paymentMethods = listOf(
         "Cash",
@@ -289,6 +295,17 @@ fun AddExpenseScreen(
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             "Please enter a valid amount"
+                        )
+                    }
+
+                    return@Button
+                }
+
+                if (category.isBlank()) {
+
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            "Please pick a category"
                         )
                     }
 
