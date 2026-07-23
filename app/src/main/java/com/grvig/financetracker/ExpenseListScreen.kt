@@ -53,15 +53,11 @@ fun ExpenseListScreen(
         mutableStateOf(false)
     }
 
-    val categories = listOf(
-        "All",
-        "Food",
-        "Transport",
-        "Shopping",
-        "Bills",
-        "Health",
-        "Entertainment"
-    )
+    var householdCategories by remember {
+        mutableStateOf<List<String>>(emptyList())
+    }
+
+    val categories = listOf("All") + householdCategories
 
     var selectedSort by remember {
         mutableStateOf("Newest")
@@ -99,6 +95,9 @@ fun ExpenseListScreen(
     LaunchedEffect(Unit) {
         refreshExpenses()
         memberEmails = householdViewModel.getMemberEmails(
+            SessionManager.currentHouseholdId
+        )
+        householdCategories = householdViewModel.getCategories(
             SessionManager.currentHouseholdId
         )
     }
