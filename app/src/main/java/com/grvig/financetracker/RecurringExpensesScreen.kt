@@ -45,7 +45,7 @@ fun RecurringExpensesScreen(
     var notes by remember { mutableStateOf("") }
 
     var category by remember {
-        mutableStateOf("Food")
+        mutableStateOf("")
     }
 
     var paymentMethod by remember {
@@ -68,14 +68,9 @@ fun RecurringExpensesScreen(
         mutableStateOf(false)
     }
 
-    val categories = listOf(
-        "Food",
-        "Transport",
-        "Shopping",
-        "Bills",
-        "Health",
-        "Entertainment"
-    )
+    var categories by remember {
+        mutableStateOf<List<String>>(emptyList())
+    }
 
     val paymentMethods = listOf(
         "Cash",
@@ -125,6 +120,12 @@ fun RecurringExpensesScreen(
         memberEmails = householdViewModel.getMemberEmails(
             SessionManager.currentHouseholdId
         )
+        categories = householdViewModel.getCategories(
+            SessionManager.currentHouseholdId
+        )
+        if (category.isBlank()) {
+            category = categories.firstOrNull() ?: ""
+        }
     }
 
     AppScaffold(
