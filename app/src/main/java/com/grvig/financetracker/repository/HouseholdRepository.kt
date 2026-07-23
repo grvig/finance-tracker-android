@@ -4,6 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.grvig.financetracker.data.Household
 import com.grvig.financetracker.data.UserProfile
+import com.grvig.financetracker.data.defaultCategories
 import kotlinx.coroutines.tasks.await
 
 class HouseholdRepository {
@@ -138,6 +139,62 @@ class HouseholdRepository {
             emails
         } catch (e: Exception) {
             emptyMap()
+        }
+    }
+
+    suspend fun getCategories(
+        householdId: String
+    ): List<String> {
+        val household = getHousehold(householdId)
+        val categories = household?.categories ?: emptyList()
+        return categories.ifEmpty { defaultCategories }
+    }
+
+    suspend fun addCategory(
+        householdId: String,
+        category: String
+    ): Result<Unit> {
+        return try {
+
+            val current = getCategories(householdId)
+
+            if (current.contains(category)) {
+                return Result.failure(
+                    Exception("Category already exists")
+                )
+            }
+
+            households.document(householdId)
+                .update("categories", current + category)
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun removeCategory(
+        householdId: String,
+        category: String
+    ): Result<Unit> {
+        return try {
+
+            val current = getCategories(householdId)
+
+            if (current.size <= 1) {
+                return Result.failure(
+                    Exception("At least one category is required")
+                )
+            }
+
+            households.document(householdId)
+                .update("categories", current - category)
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 

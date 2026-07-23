@@ -53,4 +53,24 @@ class HouseholdViewModel(
     ): Result<Unit> {
         return repository.leaveHousehold(householdId, userId)
     }
+
+    suspend fun getCategories(
+        householdId: String
+    ): List<String> {
+        return repository.getCategories(householdId)
+    }
+
+    suspend fun addCategory(
+        householdId: String,
+        category: String
+    ): Result<Unit> {
+        return repository.addCategory(householdId, category)
+    }
+
+    suspend fun removeCategory(
+        householdId: String,
+        category: String
+    ): Result<Unit> {
+        return repository.removeCategory(householdId, category)
+    }
 }
