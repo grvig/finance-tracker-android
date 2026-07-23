@@ -22,7 +22,8 @@ class HouseholdRepository {
                 id = docRef.id,
                 code = generateCode(),
                 memberIds = listOf(userId),
-                createdBy = userId
+                createdBy = userId,
+                categories = defaultCategories
             )
 
             docRef.set(household).await()
