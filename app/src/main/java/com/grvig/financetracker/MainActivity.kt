@@ -285,6 +285,7 @@ class MainActivity : ComponentActivity() {
                             EditExpenseScreen(
                                 expense = expense,
                                 expenseViewModel = expenseViewModel,
+                                householdViewModel = householdViewModel,
                                 onSaveClick = {
                                     goBack()
                                 },

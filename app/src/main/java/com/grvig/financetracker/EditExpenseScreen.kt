@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
+import com.grvig.financetracker.viewmodel.HouseholdViewModel
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -37,6 +38,7 @@ import java.time.ZoneOffset
 fun EditExpenseScreen(
     expense: Expense,
     expenseViewModel: ExpenseViewModel,
+    householdViewModel: HouseholdViewModel,
     onSaveClick: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -83,14 +85,15 @@ fun EditExpenseScreen(
         mutableStateOf(false)
     }
 
-    val categories = listOf(
-        "Food",
-        "Transport",
-        "Shopping",
-        "Bills",
-        "Health",
-        "Entertainment"
-    )
+    var categories by remember {
+        mutableStateOf<List<String>>(emptyList())
+    }
+
+    LaunchedEffect(Unit) {
+        categories = householdViewModel.getCategories(
+            SessionManager.currentHouseholdId
+        )
+    }
 
     val paymentMethods = listOf(
         "Cash",
