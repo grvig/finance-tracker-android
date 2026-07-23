@@ -25,6 +25,7 @@ import com.grvig.financetracker.data.Budget
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.BudgetViewModel
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
+import com.grvig.financetracker.viewmodel.HouseholdViewModel
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,25 +38,21 @@ import java.time.LocalDate
 fun BudgetScreen(
     budgetViewModel: BudgetViewModel,
     expenseViewModel: ExpenseViewModel,
+    householdViewModel: HouseholdViewModel,
     onBack: () -> Unit
 ) {
 
     var category by remember {
-        mutableStateOf("Food")
+        mutableStateOf("")
     }
 
     var categoryExpanded by remember {
         mutableStateOf(false)
     }
 
-    val categories = listOf(
-        "Food",
-        "Transport",
-        "Shopping",
-        "Bills",
-        "Health",
-        "Entertainment"
-    )
+    var categories by remember {
+        mutableStateOf<List<String>>(emptyList())
+    }
 
     var monthlyLimit by remember {
         mutableStateOf("")
@@ -100,6 +97,12 @@ fun BudgetScreen(
     LaunchedEffect(Unit) {
         refreshBudgets()
         refreshExpenses()
+        categories = householdViewModel.getCategories(
+            SessionManager.currentHouseholdId
+        )
+        if (category.isBlank()) {
+            category = categories.firstOrNull() ?: ""
+        }
     }
 
     val currentMonth =
@@ -260,7 +263,7 @@ fun BudgetScreen(
                         budget.toString()
                     )
 
-                    category = "Food"
+                    category = categories.firstOrNull() ?: ""
                     monthlyLimit = ""
                     warningPercent = ""
                     editingBudget = null

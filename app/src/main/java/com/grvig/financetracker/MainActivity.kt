@@ -300,6 +300,7 @@ class MainActivity : ComponentActivity() {
                         BudgetScreen(
                             budgetViewModel = budgetViewModel,
                             expenseViewModel = expenseViewModel,
+                            householdViewModel = householdViewModel,
                             onBack = {
                                 goBack()
                             }
