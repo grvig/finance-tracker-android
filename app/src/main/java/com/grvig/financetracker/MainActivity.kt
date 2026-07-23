@@ -345,8 +345,21 @@ class MainActivity : ComponentActivity() {
                             onBack = {
                                 goBack()
                             },
+                            onManageCategoriesClick = {
+                                navigateTo(Screen.MANAGE_CATEGORIES)
+                            },
                             onLeaveHousehold = {
                                 resetTo(Screen.HOUSEHOLD_SETUP)
+                            }
+                        )
+                    }
+
+                    Screen.MANAGE_CATEGORIES -> {
+
+                        ManageCategoriesScreen(
+                            householdViewModel = householdViewModel,
+                            onBack = {
+                                goBack()
                             }
                         )
                     }

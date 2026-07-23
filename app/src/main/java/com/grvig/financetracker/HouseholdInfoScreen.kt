@@ -25,6 +25,7 @@ fun HouseholdInfoScreen(
     householdViewModel: HouseholdViewModel,
     userId: String,
     onBack: () -> Unit,
+    onManageCategoriesClick: () -> Unit,
     onLeaveHousehold: () -> Unit
 ) {
 
@@ -104,6 +105,13 @@ fun HouseholdInfoScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Copy Code")
+            }
+
+            Button(
+                onClick = onManageCategoriesClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Manage Categories")
             }
 
             Button(
