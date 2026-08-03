@@ -161,6 +161,10 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                LaunchedEffect(currentScreen) {
+                    drawerState.close()
+                }
+
                 BackHandler(enabled = drawerState.isOpen) {
                     scope.launch { drawerState.close() }
                 }
