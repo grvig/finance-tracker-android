@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -66,18 +67,30 @@ fun MyExpensesScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier = Modifier.padding(20.dp)
                 ) {
                     Text(
                         text = "Your Spending",
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                     )
-                    Text("Total Spent: ${formatMoneyFull(myTotal)}")
-                    Text("Expenses: ${myExpenses.size}")
+                    Text(
+                        text = formatMoneyFull(myTotal),
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = "${myExpenses.size} expense${if (myExpenses.size == 1) "" else "s"}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
                 }
             }
 
