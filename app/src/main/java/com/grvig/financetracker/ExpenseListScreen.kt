@@ -34,6 +34,7 @@ fun ExpenseListScreen(
     householdViewModel: HouseholdViewModel,
     onAddExpenseClick: () -> Unit,
     onBack: () -> Unit,
+    onOpenDrawer: () -> Unit,
     onEditExpenseClick: (Expense) -> Unit
 ) {
 
@@ -136,7 +137,8 @@ fun ExpenseListScreen(
 
     AppScaffold(
         title = "Expense List",
-        onBack = onBack
+        onBack = onBack,
+        onOpenDrawer = onOpenDrawer
     ) { innerPadding ->
 
     Column(

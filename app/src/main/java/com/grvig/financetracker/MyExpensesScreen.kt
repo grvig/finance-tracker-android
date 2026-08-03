@@ -21,7 +21,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MyExpensesScreen(
     expenseViewModel: ExpenseViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenDrawer: () -> Unit
 ) {
 
     var expenses by remember {
@@ -52,7 +53,8 @@ fun MyExpensesScreen(
 
     AppScaffold(
         title = "My Expenses",
-        onBack = onBack
+        onBack = onBack,
+        onOpenDrawer = onOpenDrawer
     ) { innerPadding ->
 
         Column(

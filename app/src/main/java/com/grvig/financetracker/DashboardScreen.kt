@@ -65,7 +65,8 @@ onBudgetClick: () -> Unit,
 onRecurringExpensesClick: () -> Unit,
 onReportsClick: () -> Unit,
 onHouseholdClick: () -> Unit,
-onSignOutClick: () -> Unit
+onSignOutClick: () -> Unit,
+onOpenDrawer: () -> Unit
 ) {
 
     var expenses by remember {
@@ -244,7 +245,8 @@ onSignOutClick: () -> Unit
     }
 
     AppScaffold(
-        title = "Dashboard"
+        title = "Dashboard",
+        onOpenDrawer = onOpenDrawer
     ) { innerPadding ->
 
     Column(

@@ -24,6 +24,9 @@ import com.grvig.financetracker.repository.HouseholdRepository
 import com.grvig.financetracker.viewmodel.HouseholdViewModel
 import com.grvig.financetracker.viewmodel.HouseholdViewModelFactory
 import androidx.compose.material3.Text
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Alignment
@@ -134,6 +137,70 @@ class MainActivity : ComponentActivity() {
                     goBack()
                 }
 
+                val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+                val drawerScreens = setOf(
+                    Screen.DASHBOARD,
+                    Screen.ADD_EXPENSE,
+                    Screen.EXPENSE_LIST,
+                    Screen.MY_EXPENSES,
+                    Screen.BUDGET,
+                    Screen.RECURRING_EXPENSES,
+                    Screen.REPORTS
+                )
+
+                val drawerEnabled = currentScreen in drawerScreens
+
+                var drawerMemberCount by remember { mutableStateOf(0) }
+
+                LaunchedEffect(drawerEnabled, SessionManager.currentHouseholdId) {
+                    if (drawerEnabled && SessionManager.currentHouseholdId.isNotBlank()) {
+                        drawerMemberCount = householdViewModel.getHousehold(
+                            SessionManager.currentHouseholdId
+                        )?.memberIds?.size ?: 0
+                    }
+                }
+
+                BackHandler(enabled = drawerState.isOpen) {
+                    scope.launch { drawerState.close() }
+                }
+
+                fun openDrawer() {
+                    scope.launch { drawerState.open() }
+                }
+
+                fun navigateFromDrawer(screen: Screen) {
+                    scope.launch { drawerState.close() }
+                    if (screen != currentScreen) {
+                        if (screen == Screen.DASHBOARD) {
+                            resetTo(Screen.DASHBOARD)
+                        } else {
+                            resetTo(Screen.DASHBOARD)
+                            navigateTo(screen)
+                        }
+                    }
+                }
+
+                ModalNavigationDrawer(
+                    drawerState = drawerState,
+                    gesturesEnabled = drawerEnabled,
+                    drawerContent = {
+                        if (drawerEnabled) {
+                            AppDrawerContent(
+                                currentScreen = currentScreen,
+                                userEmail = authViewModel.currentUser?.email ?: "",
+                                memberCount = drawerMemberCount,
+                                onNavigate = { navigateFromDrawer(it) },
+                                onHouseholdClick = {
+                                    scope.launch { drawerState.close() }
+                                    resetTo(Screen.DASHBOARD)
+                                    navigateTo(Screen.HOUSEHOLD_INFO)
+                                }
+                            )
+                        }
+                    }
+                ) {
+
                 when (currentScreen) {
 
                     Screen.LOADING -> {
@@ -242,7 +309,8 @@ class MainActivity : ComponentActivity() {
                                 authViewModel.signOut()
                                 SessionManager.currentHouseholdId = ""
                                 resetTo(Screen.LOGIN)
-                            }
+                            },
+                            onOpenDrawer = { openDrawer() }
                         )
                     }
 
@@ -269,6 +337,7 @@ class MainActivity : ComponentActivity() {
                             onBack = {
                                 goBack()
                             },
+                            onOpenDrawer = { openDrawer() },
                             onEditExpenseClick = { expense ->
 
                                 selectedExpense = expense
@@ -303,7 +372,8 @@ class MainActivity : ComponentActivity() {
                             householdViewModel = householdViewModel,
                             onBack = {
                                 goBack()
-                            }
+                            },
+                            onOpenDrawer = { openDrawer() }
                         )
                     }
 
@@ -314,7 +384,8 @@ class MainActivity : ComponentActivity() {
                             householdViewModel = householdViewModel,
                             onBack = {
                                 goBack()
-                            }
+                            },
+                            onOpenDrawer = { openDrawer() }
                         )
                     }
 
@@ -326,7 +397,8 @@ class MainActivity : ComponentActivity() {
                             householdViewModel = householdViewModel,
                             onBack = {
                                 goBack()
-                            }
+                            },
+                            onOpenDrawer = { openDrawer() }
                         )
                     }
 
@@ -336,7 +408,8 @@ class MainActivity : ComponentActivity() {
                             expenseViewModel = expenseViewModel,
                             onBack = {
                                 goBack()
-                            }
+                            },
+                            onOpenDrawer = { openDrawer() }
                         )
                     }
 
@@ -366,6 +439,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+                }
                 }
             }
         }

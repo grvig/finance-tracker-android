@@ -36,7 +36,8 @@ fun ReportsScreen(
     expenseViewModel: ExpenseViewModel,
     budgetViewModel: BudgetViewModel,
     householdViewModel: HouseholdViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenDrawer: () -> Unit
 ) {
 
     var expenses by remember {
@@ -136,7 +137,8 @@ fun ReportsScreen(
 
     AppScaffold(
         title = "Reports",
-        onBack = onBack
+        onBack = onBack,
+        onOpenDrawer = onOpenDrawer
     ) { innerPadding ->
 
     Column(

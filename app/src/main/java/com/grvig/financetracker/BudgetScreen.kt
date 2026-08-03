@@ -39,7 +39,8 @@ fun BudgetScreen(
     budgetViewModel: BudgetViewModel,
     expenseViewModel: ExpenseViewModel,
     householdViewModel: HouseholdViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenDrawer: () -> Unit
 ) {
 
     var category by remember {
@@ -124,7 +125,8 @@ fun BudgetScreen(
 
     AppScaffold(
         title = "Budget Tracking",
-        onBack = onBack
+        onBack = onBack,
+        onOpenDrawer = onOpenDrawer
     ) { innerPadding ->
 
     Column(

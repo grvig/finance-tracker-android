@@ -37,7 +37,8 @@ import java.time.temporal.ChronoUnit
 fun RecurringExpensesScreen(
     recurringExpenseViewModel: RecurringExpenseViewModel,
     householdViewModel: HouseholdViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenDrawer: () -> Unit
 ) {
 
     var title by remember { mutableStateOf("") }
@@ -130,7 +131,8 @@ fun RecurringExpensesScreen(
 
     AppScaffold(
         title = "Recurring Expenses",
-        onBack = onBack
+        onBack = onBack,
+        onOpenDrawer = onOpenDrawer
     ) { innerPadding ->
 
     Column(
