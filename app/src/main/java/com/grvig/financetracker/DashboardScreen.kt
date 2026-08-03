@@ -52,133 +52,6 @@ private fun nextDueDateAfter(
     return advancedDate.toString()
 }
 
-private val chartColors = listOf(
-    Color(0xFF7aa2f7),
-    Color(0xFFbb9af7),
-    Color(0xFF9ece6a),
-    Color(0xFFe0af68),
-    Color(0xFFf7768e),
-    Color(0xFF7dcfff)
-)
-
-@Composable
-private fun CategoryBreakdownChart(
-    categoryTotals: List<Pair<String, Double>>
-) {
-
-    val maxAmount = categoryTotals.maxOfOrNull {
-        it.second
-    } ?: 0.0
-
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-
-        categoryTotals.forEachIndexed { index, (category, amount) ->
-
-            val barWidthFraction = if (maxAmount > 0) {
-                (amount / maxAmount).toFloat()
-            } else {
-                0f
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            ) {
-
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .background(
-                            chartColors[index % chartColors.size]
-                        )
-                )
-
-                Text(
-                    text = category,
-                    modifier = Modifier
-                        .padding(start = 6.dp)
-                        .width(84.dp)
-                )
-
-                Canvas(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(20.dp)
-                ) {
-                    drawRect(
-                        color = chartColors[index % chartColors.size],
-                        size = Size(
-                            size.width * barWidthFraction,
-                            size.height
-                        )
-                    )
-                }
-
-                Text(
-                    text = "₹$amount"
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun MonthlyTrendChart(
-    monthlyTotals: List<Pair<String, Double>>
-) {
-
-    val maxAmount = monthlyTotals.maxOfOrNull {
-        it.second
-    } ?: 0.0
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-
-        monthlyTotals.forEach { (month, amount) ->
-
-            val barHeightFraction = if (maxAmount > 0) {
-                (amount / maxAmount).toFloat()
-            } else {
-                0f
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                Canvas(
-                    modifier = Modifier
-                        .width(24.dp)
-                        .height(80.dp)
-                ) {
-                    drawRect(
-                        color = chartColors[0],
-                        topLeft = androidx.compose.ui.geometry.Offset(
-                            0f,
-                            size.height * (1 - barHeightFraction)
-                        ),
-                        size = Size(
-                            size.width,
-                            size.height * barHeightFraction
-                        )
-                    )
-                }
-
-                Text(
-                    text = month,
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
-        }
-    }
-}
-
 @Composable
 fun DashboardScreen(
 expenseViewModel: ExpenseViewModel,
@@ -396,11 +269,57 @@ onSignOutClick: () -> Unit
             )
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(20.dp)
             ) {
-                Text("Total Expenses: $totalExpenses")
-                Text("Total Spent: ₹$totalSpent")
-                Text("Average Expense: ₹$averageExpense")
+
+                Text(
+                    text = "This Month",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                )
+
+                Text(
+                    text = formatMoneyFull(monthSpent),
+                    style = MaterialTheme.typography.displaySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+
+                if (lastMonthSpent > 0) {
+                    Text(
+                        text = if (monthlyChangePercent >= 0)
+                            "▲ $monthlyChangePercent% vs last month"
+                        else
+                            "▼ ${-monthlyChangePercent}% vs last month",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                ) {
+                    StatTile(
+                        label = "Today",
+                        value = formatMoneyFull(todaySpent),
+                        onContainer = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatTile(
+                        label = "Expenses",
+                        value = totalExpenses.toString(),
+                        onContainer = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatTile(
+                        label = "Avg",
+                        value = formatMoneyFull(averageExpense),
+                        onContainer = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
 
@@ -411,38 +330,64 @@ onSignOutClick: () -> Unit
             )
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text("Today's Spending: ₹$todaySpent")
-                Text("This Month's Spending: ₹$monthSpent")
-                Text("Change From Last Month: $monthlyChangePercent%")
-            }
-        }
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(20.dp)
             ) {
 
-                Text(
-                    "Total Budget: ₹$totalBudget"
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Column {
+                        Text(
+                            text = "Budget Remaining",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                        )
+                        Text(
+                            text = formatMoneyFull(remainingBudget),
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
 
-                Text(
-                    "Remaining Budget: ₹$remainingBudget"
-                )
+                    Text(
+                        text = "of ${formatMoneyFull(totalBudget)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                    )
+                }
 
-                Text(
-                    "Largest Category: $largestCategory"
-                )
+                if (totalBudget > 0) {
 
-                Text(
-                    "Budget Usage: $budgetUsagePercent%"
-                )
+                    BudgetProgressBar(
+                        percent = budgetUsagePercent,
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+
+                    Text(
+                        text = "$budgetUsagePercent% used",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(top = 6.dp)
+                    )
+                } else {
+                    Text(
+                        text = "No budgets set yet",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
+                if (largestCategory != "None") {
+                    Text(
+                        text = "Top category: $largestCategory",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
+                }
             }
         }
 
