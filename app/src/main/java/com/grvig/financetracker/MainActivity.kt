@@ -195,6 +195,12 @@ class MainActivity : ComponentActivity() {
                                     scope.launch { drawerState.close() }
                                     resetTo(Screen.DASHBOARD)
                                     navigateTo(Screen.HOUSEHOLD_INFO)
+                                },
+                                onSignOutClick = {
+                                    scope.launch { drawerState.close() }
+                                    authViewModel.signOut()
+                                    SessionManager.currentHouseholdId = ""
+                                    resetTo(Screen.LOGIN)
                                 }
                             )
                         }

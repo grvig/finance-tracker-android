@@ -71,7 +71,8 @@ fun AppDrawerContent(
     userEmail: String,
     memberCount: Int,
     onNavigate: (Screen) -> Unit,
-    onHouseholdClick: () -> Unit
+    onHouseholdClick: () -> Unit,
+    onSignOutClick: () -> Unit
 ) {
 
     ModalDrawerSheet(
@@ -186,6 +187,16 @@ fun AppDrawerContent(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+
+                Text(
+                    text = "Sign out",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(onClick = onSignOutClick)
+                        .padding(horizontal = 10.dp, vertical = 8.dp)
+                )
             }
         }
     }

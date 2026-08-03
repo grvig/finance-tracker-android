@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -440,59 +441,26 @@ onOpenDrawer: () -> Unit
             }
         }
 
-        Button(
-            onClick = onAddExpenseClick,
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Add Expense")
-        }
 
-        Button(
-            onClick = onViewExpensesClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("View Expenses")
-        }
+            Button(
+                onClick = onAddExpenseClick,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Add Expense")
+            }
 
-        Button(
-            onClick = onMyExpensesClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("My Expenses")
-        }
-        Button(
-            onClick = onBudgetClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Budget Tracking")
-        }
-
-        Button(
-            onClick = onRecurringExpensesClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Recurring Expenses")
-        }
-
-        Button(
-            onClick = onReportsClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Reports")
-        }
-
-        Button(
-            onClick = onHouseholdClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Household")
-        }
-
-        Button(
-            onClick = onSignOutClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Sign Out")
+            OutlinedButton(
+                onClick = onViewExpensesClick,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("All Expenses")
+            }
         }
     }
     }
