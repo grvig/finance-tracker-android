@@ -212,9 +212,9 @@ fun ReportsScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
 
-                    Text("Total Spent: ₹$totalSpent")
+                    Text("Total Spent: ${formatMoneyFull(totalSpent)}")
                     Text("Total Expenses: $totalCount")
-                    Text("Average Expense: ₹$averageExpense")
+                    Text("Average Expense: ${formatMoneyFull(averageExpense)}")
 
                     if (totalBudget > 0) {
                         Text("Budget Usage: $budgetUsagePercent%")
@@ -242,7 +242,7 @@ fun ReportsScreen(
                             0
                         }
 
-                        Text("$category: ₹$amount ($percent%)")
+                        Text("$category: ${formatMoneyFull(amount)} ($percent%)")
                     }
                 }
             }
@@ -267,7 +267,7 @@ fun ReportsScreen(
                             else -> memberEmails[memberId] ?: "a member"
                         }
 
-                        Text("$label: ₹$amount")
+                        Text("$label: ${formatMoneyFull(amount)}")
                     }
                 }
             }

@@ -76,7 +76,7 @@ fun MyExpensesScreen(
                         text = "Your Spending",
                         style = MaterialTheme.typography.titleMedium
                     )
-                    Text("Total Spent: ₹$myTotal")
+                    Text("Total Spent: ${formatMoneyFull(myTotal)}")
                     Text("Expenses: ${myExpenses.size}")
                 }
             }
@@ -103,7 +103,10 @@ fun MyExpensesScreen(
                         Column(
                             modifier = Modifier.padding(12.dp)
                         ) {
-                            Text("₹${expense.amount}")
+                            Text(
+                                text = formatMoneyFull(expense.amount),
+                                style = MaterialTheme.typography.titleMedium
+                            )
                             Text(expense.category)
                             Text(expense.date)
                             if (expense.description.isNotBlank()) {

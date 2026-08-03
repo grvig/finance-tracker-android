@@ -430,7 +430,10 @@ fun RecurringExpensesScreen(
                     ) {
 
                         Text(recurringExpense.title)
-                        Text("₹${recurringExpense.amount}")
+                        Text(
+                            text = formatMoneyFull(recurringExpense.amount),
+                            style = MaterialTheme.typography.titleMedium
+                        )
                         Text(recurringExpense.category)
                         Text(
                             "${recurringExpense.frequency}, next due ${recurringExpense.nextDueDate}"

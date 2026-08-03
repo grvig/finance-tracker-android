@@ -337,11 +337,11 @@ fun BudgetScreen(
                         )
 
                         Text(
-                            text = "₹${budget.monthlyLimit}"
+                            text = formatMoneyFull(budget.monthlyLimit)
                         )
 
                         Text(
-                            text = "Spent: ₹$spent"
+                            text = "Spent: ${formatMoneyFull(spent)}"
                         )
 
                         if (spentPercent >= budget.warningPercent) {
