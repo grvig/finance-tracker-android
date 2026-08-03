@@ -1,5 +1,6 @@
 package com.grvig.financetracker
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
@@ -397,7 +398,14 @@ onOpenDrawer: () -> Unit
         if (categoryTotals.isNotEmpty()) {
 
             Card(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                border = BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
+                )
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
@@ -409,14 +417,22 @@ onOpenDrawer: () -> Unit
                     )
 
                     CategoryBreakdownChart(
-                        categoryTotals = categoryTotals
+                        categoryTotals = categoryTotals,
+                        modifier = Modifier.padding(top = 8.dp)
                     )
                 }
             }
         }
 
         Card(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            border = BorderStroke(
+                1.dp,
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
+            )
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
