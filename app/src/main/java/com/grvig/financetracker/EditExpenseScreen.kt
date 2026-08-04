@@ -229,12 +229,10 @@ fun EditExpenseScreen(
             }
         }
 
-        Button(
-            onClick = { showDatePicker = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Date: $selectedDate")
-        }
+        DateField(
+            date = selectedDate,
+            onClick = { showDatePicker = true }
+        )
 
         if (showDatePicker) {
 
