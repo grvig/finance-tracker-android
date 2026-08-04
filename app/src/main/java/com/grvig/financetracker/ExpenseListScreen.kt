@@ -6,9 +6,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -139,7 +147,23 @@ fun ExpenseListScreen(
     AppScaffold(
         title = "Expense List",
         onBack = onBack,
-        onOpenDrawer = onOpenDrawer
+        onOpenDrawer = onOpenDrawer,
+        actions = {
+            IconButton(onClick = { refreshExpenses() }) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = "Refresh"
+                )
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddExpenseClick) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add expense"
+                )
+            }
+        }
     ) { innerPadding ->
 
     Column(
@@ -147,26 +171,6 @@ fun ExpenseListScreen(
             .fillMaxSize()
             .padding(innerPadding)
     ) {
-
-        Button(
-            onClick = onAddExpenseClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text("Add New Expense")
-        }
-
-        Button(
-            onClick = {
-                refreshExpenses()
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text("Refresh")
-        }
 
         OutlinedTextField(
             value = searchQuery,
@@ -287,64 +291,30 @@ fun ExpenseListScreen(
             )
         }
 
-        LazyColumn {
+        LazyColumn(
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = 4.dp,
+                bottom = 88.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
 
             items(sortedExpenses) { expense ->
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 6.dp
-                        )
-                ) {
-
-                    Column(
-                        modifier = Modifier.padding(12.dp)
-                    ) {
-
-                        val addedByLabel = when {
-                            expense.addedBy.isBlank() -> ""
-                            expense.addedBy == currentUserId -> "Added by You"
-                            else -> "Added by ${memberEmails[expense.addedBy] ?: "a member"}"
-                        }
-
-                        Text(
-                            text = formatMoneyFull(expense.amount),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(expense.category)
-                        Text(expense.paymentMethod)
-                        Text(expense.description)
-
-                        if (addedByLabel.isNotBlank()) {
-                            Text(addedByLabel)
-                        }
-
-                        Button(
-                            onClick = {
-                                onEditExpenseClick(expense)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                        ) {
-                            Text("Edit")
-                        }
-
-                        Button(
-                            onClick = {
-                                expenseToDelete = expense
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                        ) {
-                            Text("Delete")
-                        }
-                    }
+                val addedByLabel = when {
+                    expense.addedBy.isBlank() -> ""
+                    expense.addedBy == currentUserId -> "Added by You"
+                    else -> "Added by ${memberEmails[expense.addedBy] ?: "a member"}"
                 }
+
+                ExpenseRow(
+                    expense = expense,
+                    addedByLabel = addedByLabel,
+                    onEditClick = { onEditExpenseClick(expense) },
+                    onDeleteClick = { expenseToDelete = expense }
+                )
             }
         }
 
