@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
@@ -136,7 +137,20 @@ fun BudgetScreen(
     AppScaffold(
         title = "Budget Tracking",
         onBack = onBack,
-        onOpenDrawer = onOpenDrawer
+        onOpenDrawer = onOpenDrawer,
+        actions = {
+            IconButton(
+                onClick = {
+                    refreshBudgets()
+                    refreshExpenses()
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = "Refresh"
+                )
+            }
+        }
     ) { innerPadding ->
 
     Column(
@@ -296,16 +310,6 @@ fun BudgetScreen(
                 else
                     "Save Budget"
             )
-        }
-
-        Button(
-            onClick = {
-                refreshBudgets()
-                refreshExpenses()
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Refresh")
         }
 
         Text(
