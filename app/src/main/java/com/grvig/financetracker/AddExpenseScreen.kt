@@ -18,10 +18,10 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -324,9 +324,15 @@ fun AddExpenseScreen(
                 )
 
                 scope.launch {
-                    snackbarHostState.showSnackbar(
-                        "Expense saved to database"
+
+                    val result = snackbarHostState.showSnackbar(
+                        message = "Expense saved",
+                        actionLabel = "View"
                     )
+
+                    if (result == SnackbarResult.ActionPerformed) {
+                        onViewExpensesClick()
+                    }
                 }
 
                 amount = ""
@@ -342,13 +348,6 @@ fun AddExpenseScreen(
                 text = "Save Expense",
                 style = MaterialTheme.typography.labelLarge
             )
-        }
-
-        OutlinedButton(
-            onClick = onViewExpensesClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("View All Expenses")
         }
 
         SnackbarHost(
