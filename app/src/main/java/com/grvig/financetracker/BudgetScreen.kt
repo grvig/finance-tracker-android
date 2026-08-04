@@ -5,8 +5,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -310,72 +320,119 @@ fun BudgetScreen(
             )
         }
 
-        LazyColumn {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(bottom = 24.dp)
+        ) {
 
             items(budgets) { budget ->
 
+                val spent = spentForCategory(budget.category)
+
+                val spentPercent = if (budget.monthlyLimit > 0) {
+                    ((spent / budget.monthlyLimit) * 100).toInt()
+                } else {
+                    0
+                }
+
+                val overWarning = spentPercent >= budget.warningPercent
+
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
 
                     Column(
-                        modifier = Modifier.padding(12.dp)
+                        modifier = Modifier.padding(
+                            start = 14.dp,
+                            end = 6.dp,
+                            top = 12.dp,
+                            bottom = 12.dp
+                        )
                     ) {
 
-                        val spent = spentForCategory(budget.category)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
 
-                        val spentPercent = if (budget.monthlyLimit > 0) {
-                            ((spent / budget.monthlyLimit) * 100).toInt()
-                        } else {
-                            0
-                        }
+                            Column(modifier = Modifier.weight(1f)) {
 
-                        Text(
-                            text = budget.category
-                        )
+                                Text(
+                                    text = budget.category,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
 
-                        Text(
-                            text = formatMoneyFull(budget.monthlyLimit)
-                        )
+                                Text(
+                                    text = "${formatMoneyFull(spent)} of ${formatMoneyFull(budget.monthlyLimit)}",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(top = 2.dp)
+                                )
+                            }
 
-                        Text(
-                            text = "Spent: ${formatMoneyFull(spent)}"
-                        )
-
-                        if (spentPercent >= budget.warningPercent) {
                             Text(
-                                text = "⚠ $spentPercent% of budget used"
+                                text = "$spentPercent%",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = if (overWarning) {
+                                    MaterialTheme.colorScheme.error
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface
+                                }
                             )
+
+                            IconButton(
+                                onClick = {
+
+                                    category = budget.category
+
+                                    monthlyLimit =
+                                        budget.monthlyLimit.toString()
+
+                                    warningPercent =
+                                        budget.warningPercent.toString()
+                                    editingBudget = budget
+                                },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = "Edit budget",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(19.dp)
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    budgetToDelete = budget
+                                },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Delete,
+                                    contentDescription = "Delete budget",
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(19.dp)
+                                )
+                            }
                         }
-                        Button(
-                            onClick = {
 
-                                category = budget.category
+                        BudgetProgressBar(
+                            percent = spentPercent,
+                            modifier = Modifier.padding(top = 10.dp, end = 8.dp)
+                        )
 
-                                monthlyLimit =
-                                    budget.monthlyLimit.toString()
-
-                                warningPercent =
-                                    budget.warningPercent.toString()
-                                editingBudget = budget
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                        ) {
-                            Text("Load Into Form")
-                        }
-                        Button(
-                            onClick = {
-                                budgetToDelete = budget
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                        ) {
-                            Text("Delete")
+                        if (overWarning) {
+                            Text(
+                                text = "Over your ${budget.warningPercent}% warning level",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(top = 6.dp)
+                            )
                         }
                     }
                 }
