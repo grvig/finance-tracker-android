@@ -7,8 +7,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -415,107 +428,170 @@ fun RecurringExpensesScreen(
             it.nextDueDate
         }
 
-        LazyColumn {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(bottom = 24.dp)
+        ) {
 
             items(sortedRecurringExpenses) { recurringExpense ->
 
+                val daysUntilDue = ChronoUnit.DAYS.between(
+                    LocalDate.now(),
+                    LocalDate.parse(recurringExpense.nextDueDate)
+                )
+
+                val dueLabel = when {
+                    daysUntilDue < 0 -> "Overdue by ${-daysUntilDue} days"
+                    daysUntilDue == 0L -> "Due today"
+                    else -> "Due in $daysUntilDue days"
+                }
+
+                val setUpByLabel = when {
+                    recurringExpense.addedBy.isBlank() -> ""
+                    recurringExpense.addedBy == currentUserId -> "Set up by You"
+                    else -> "Set up by ${memberEmails[recurringExpense.addedBy] ?: "a member"}"
+                }
+
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
 
                     Column(
-                        modifier = Modifier.padding(12.dp)
+                        modifier = Modifier.padding(
+                            start = 14.dp,
+                            end = 6.dp,
+                            top = 12.dp,
+                            bottom = 10.dp
+                        )
                     ) {
 
-                        Text(recurringExpense.title)
-                        Text(
-                            text = formatMoneyFull(recurringExpense.amount),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(recurringExpense.category)
-                        Text(
-                            "${recurringExpense.frequency}, next due ${recurringExpense.nextDueDate}"
-                        )
-
-                        val daysUntilDue = ChronoUnit.DAYS.between(
-                            LocalDate.now(),
-                            LocalDate.parse(recurringExpense.nextDueDate)
-                        )
-
-                        Text(
-                            when {
-                                daysUntilDue < 0 -> "Overdue by ${-daysUntilDue} days"
-                                daysUntilDue == 0L -> "Due today"
-                                else -> "Due in $daysUntilDue days"
-                            }
-                        )
-
-                        Text(
-                            if (recurringExpense.isActive) "Active" else "Paused"
-                        )
-
-                        val setUpByLabel = when {
-                            recurringExpense.addedBy.isBlank() -> ""
-                            recurringExpense.addedBy == currentUserId -> "Set up by You"
-                            else -> "Set up by ${memberEmails[recurringExpense.addedBy] ?: "a member"}"
-                        }
-
-                        if (setUpByLabel.isNotBlank()) {
-                            Text(setUpByLabel)
-                        }
-
-                        Button(
-                            onClick = {
-
-                                title = recurringExpense.title
-                                amount = recurringExpense.amount.toString()
-                                notes = recurringExpense.notes
-                                category = recurringExpense.category
-                                paymentMethod = recurringExpense.paymentMethod
-                                frequency = recurringExpense.frequency
-                                editingRecurringExpense = recurringExpense
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.Top
                         ) {
-                            Text("Load Into Form")
-                        }
 
-                        Button(
-                            onClick = {
+                            Column(modifier = Modifier.weight(1f)) {
 
-                                recurringExpenseViewModel.updateRecurringExpense(
-                                    recurringExpense.copy(
-                                        isActive = !recurringExpense.isActive
-                                    )
+                                Text(
+                                    text = recurringExpense.title,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
 
-                                scope.launch {
-                                    kotlinx.coroutines.delay(200)
-                                    refreshRecurringExpenses()
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(top = 6.dp)
+                                ) {
+                                    CategoryChip(category = recurringExpense.category)
+
+                                    Text(
+                                        text = recurringExpense.frequency,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                        ) {
+                            }
+
                             Text(
-                                if (recurringExpense.isActive) "Pause" else "Resume"
+                                text = formatMoneyFull(recurringExpense.amount),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 8.dp, end = 8.dp)
                             )
                         }
 
-                        Button(
-                            onClick = {
-                                recurringExpenseToDelete = recurringExpense
+                        Text(
+                            text = if (recurringExpense.isActive) {
+                                dueLabel
+                            } else {
+                                "Paused"
                             },
+                            style = MaterialTheme.typography.labelMedium,
+                            color = if (recurringExpense.isActive && daysUntilDue <= 0) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 8.dp)
+                                .padding(top = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Delete")
+
+                            Text(
+                                text = setUpByLabel,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            TextButton(
+                                onClick = {
+
+                                    recurringExpenseViewModel.updateRecurringExpense(
+                                        recurringExpense.copy(
+                                            isActive = !recurringExpense.isActive
+                                        )
+                                    )
+
+                                    scope.launch {
+                                        kotlinx.coroutines.delay(200)
+                                        refreshRecurringExpenses()
+                                    }
+                                }
+                            ) {
+                                Text(
+                                    text = if (recurringExpense.isActive) "Pause" else "Resume",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+
+                                    title = recurringExpense.title
+                                    amount = recurringExpense.amount.toString()
+                                    notes = recurringExpense.notes
+                                    category = recurringExpense.category
+                                    paymentMethod = recurringExpense.paymentMethod
+                                    frequency = recurringExpense.frequency
+                                    editingRecurringExpense = recurringExpense
+                                },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = "Edit recurring expense",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(19.dp)
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    recurringExpenseToDelete = recurringExpense
+                                },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Delete,
+                                    contentDescription = "Delete recurring expense",
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(19.dp)
+                                )
+                            }
                         }
                     }
                 }
