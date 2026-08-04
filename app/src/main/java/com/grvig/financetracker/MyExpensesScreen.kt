@@ -2,6 +2,7 @@ package com.grvig.financetracker
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -97,36 +98,27 @@ fun MyExpensesScreen(
             if (myExpenses.isEmpty()) {
                 Text(
                     text = "You haven't added any expenses yet",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(16.dp)
                 )
             }
 
-            LazyColumn {
+            LazyColumn(
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 24.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
 
                 items(myExpenses) { expense ->
 
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = 16.dp,
-                                vertical = 6.dp
-                            )
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Text(
-                                text = formatMoneyFull(expense.amount),
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(expense.category)
-                            Text(expense.date)
-                            if (expense.description.isNotBlank()) {
-                                Text(expense.description)
-                            }
-                        }
-                    }
+                    ExpenseRow(
+                        expense = expense,
+                        addedByLabel = ""
+                    )
                 }
             }
         }
