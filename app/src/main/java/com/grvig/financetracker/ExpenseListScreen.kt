@@ -38,7 +38,8 @@ fun ExpenseListScreen(
     onAddExpenseClick: () -> Unit,
     onBack: () -> Unit,
     onOpenDrawer: () -> Unit,
-    onEditExpenseClick: (Expense) -> Unit
+    onEditExpenseClick: (Expense) -> Unit,
+    initialCategory: String = FILTER_ALL
 ) {
 
     var expenses by remember {
@@ -46,7 +47,7 @@ fun ExpenseListScreen(
     }
 
     var filters by remember {
-        mutableStateOf(ExpenseFilters())
+        mutableStateOf(ExpenseFilters(category = initialCategory))
     }
 
     var showRangePicker by remember {

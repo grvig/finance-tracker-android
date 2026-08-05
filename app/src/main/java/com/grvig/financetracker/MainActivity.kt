@@ -116,6 +116,10 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf<Expense?>(null)
                 }
 
+                var expenseListCategory by remember {
+                    mutableStateOf(FILTER_ALL)
+                }
+
                 val scope = rememberCoroutineScope()
 
                 fun navigateTo(screen: Screen) {
@@ -175,6 +179,7 @@ class MainActivity : ComponentActivity() {
 
                 fun navigateFromDrawer(screen: Screen) {
                     scope.launch { drawerState.close() }
+                    expenseListCategory = FILTER_ALL
                     if (screen != currentScreen) {
                         if (screen == Screen.DASHBOARD) {
                             resetTo(Screen.DASHBOARD)
@@ -298,6 +303,11 @@ class MainActivity : ComponentActivity() {
                                 navigateTo(Screen.ADD_EXPENSE)
                             },
                             onViewExpensesClick = {
+                                expenseListCategory = FILTER_ALL
+                                navigateTo(Screen.EXPENSE_LIST)
+                            },
+                            onCategoryClick = { category ->
+                                expenseListCategory = category
                                 navigateTo(Screen.EXPENSE_LIST)
                             },
                             onMyExpensesClick = {
@@ -353,7 +363,8 @@ class MainActivity : ComponentActivity() {
                                 selectedExpense = expense
 
                                 navigateTo(Screen.EDIT_EXPENSE)
-                            }
+                            },
+                            initialCategory = expenseListCategory
                         )
                     }
 

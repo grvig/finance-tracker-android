@@ -62,6 +62,7 @@ recurringExpenseViewModel: RecurringExpenseViewModel,
 householdViewModel: HouseholdViewModel,
 onAddExpenseClick: () -> Unit,
 onViewExpensesClick: () -> Unit,
+onCategoryClick: (String) -> Unit,
 onMyExpensesClick: () -> Unit,
 onBudgetClick: () -> Unit,
 onRecurringExpensesClick: () -> Unit,
@@ -418,7 +419,8 @@ onOpenDrawer: () -> Unit
 
                     CategoryBreakdownChart(
                         categoryTotals = categoryTotals,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp),
+                        onCategoryClick = onCategoryClick
                     )
                 }
             }

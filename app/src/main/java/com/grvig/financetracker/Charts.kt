@@ -2,6 +2,7 @@ package com.grvig.financetracker
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -151,7 +152,8 @@ fun BudgetProgressBar(
 @Composable
 fun CategoryBreakdownChart(
     categoryTotals: List<Pair<String, Double>>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCategoryClick: ((String) -> Unit)? = null
 ) {
 
     val total = categoryTotals.sumOf { it.second }
@@ -189,6 +191,16 @@ fun CategoryBreakdownChart(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .then(
+                        if (onCategoryClick != null) {
+                            Modifier.clickable {
+                                onCategoryClick(category)
+                            }
+                        } else {
+                            Modifier
+                        }
+                    )
                     .padding(vertical = 6.dp)
             ) {
 
