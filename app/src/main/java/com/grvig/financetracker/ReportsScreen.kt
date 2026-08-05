@@ -37,7 +37,8 @@ fun ReportsScreen(
     budgetViewModel: BudgetViewModel,
     householdViewModel: HouseholdViewModel,
     onBack: () -> Unit,
-    onOpenDrawer: () -> Unit
+    onOpenDrawer: () -> Unit,
+    onCategoryClick: (String) -> Unit
 ) {
 
     var expenses by remember {
@@ -234,15 +235,21 @@ fun ReportsScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
 
-                    categoryBreakdown.forEach { (category, amount) ->
+                    if (categoryBreakdown.isEmpty()) {
 
-                        val percent = if (totalSpent > 0) {
-                            ((amount / totalSpent) * 100).toInt()
-                        } else {
-                            0
-                        }
+                        Text(
+                            text = "No spending this month",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    } else {
 
-                        Text("$category: ${formatMoneyFull(amount)} ($percent%)")
+                        CategoryBreakdownChart(
+                            categoryTotals = categoryBreakdown,
+                            modifier = Modifier.padding(top = 8.dp),
+                            onCategoryClick = onCategoryClick
+                        )
                     }
                 }
             }

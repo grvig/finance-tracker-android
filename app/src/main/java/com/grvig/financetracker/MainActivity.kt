@@ -419,7 +419,11 @@ class MainActivity : ComponentActivity() {
                             onBack = {
                                 goBack()
                             },
-                            onOpenDrawer = { openDrawer() }
+                            onOpenDrawer = { openDrawer() },
+                            onCategoryClick = { category ->
+                                expenseListCategory = category
+                                navigateTo(Screen.EXPENSE_LIST)
+                            }
                         )
                     }
 
