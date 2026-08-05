@@ -18,17 +18,31 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
+import com.grvig.financetracker.viewmodel.HouseholdViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun MyExpensesScreen(
     expenseViewModel: ExpenseViewModel,
+    householdViewModel: HouseholdViewModel,
     onBack: () -> Unit,
     onOpenDrawer: () -> Unit
 ) {
 
     var expenses by remember {
         mutableStateOf<List<Expense>>(emptyList())
+    }
+
+    var filters by remember {
+        mutableStateOf(ExpenseFilters())
+    }
+
+    var showRangePicker by remember {
+        mutableStateOf(false)
+    }
+
+    var householdCategories by remember {
+        mutableStateOf<List<String>>(emptyList())
     }
 
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -38,16 +52,17 @@ fun MyExpensesScreen(
     LaunchedEffect(Unit) {
         scope.launch {
             expenses = expenseViewModel.getAllExpenses()
+            householdCategories = householdViewModel.getCategories(
+                SessionManager.currentHouseholdId
+            )
         }
     }
 
-    val myExpenses = expenses
-        .filter {
-            it.addedBy == currentUserId
-        }
-        .sortedByDescending {
-            it.date + it.time
-        }
+    val mine = expenses.filter {
+        it.addedBy == currentUserId
+    }
+
+    val myExpenses = mine.applyFilters(filters)
 
     val myTotal = myExpenses.sumOf {
         it.amount
@@ -95,12 +110,41 @@ fun MyExpensesScreen(
                 }
             }
 
+            ExpenseFilterBar(
+                filters = filters,
+                categories = householdCategories,
+                paymentMethods = PAYMENT_METHODS,
+                onFiltersChange = { filters = it },
+                onCustomRangeClick = { showRangePicker = true }
+            )
+
             if (myExpenses.isEmpty()) {
                 Text(
-                    text = "You haven't added any expenses yet",
+                    text = if (mine.isEmpty()) {
+                        "You haven't added any expenses yet"
+                    } else {
+                        "No expenses match these filters"
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            if (showRangePicker) {
+
+                DateRangePickerDialog(
+                    initialStart = filters.customStart,
+                    initialEnd = filters.customEnd,
+                    onDismiss = { showRangePicker = false },
+                    onConfirm = { start, end ->
+                        filters = filters.copy(
+                            dateRange = DateRange.CUSTOM,
+                            customStart = start,
+                            customEnd = end
+                        )
+                        showRangePicker = false
+                    }
                 )
             }
 

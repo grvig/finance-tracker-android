@@ -416,6 +416,7 @@ class MainActivity : ComponentActivity() {
 
                         MyExpensesScreen(
                             expenseViewModel = expenseViewModel,
+                            householdViewModel = householdViewModel,
                             onBack = {
                                 goBack()
                             },
