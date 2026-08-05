@@ -5,6 +5,13 @@ import java.time.LocalDate
 
 const val FILTER_ALL = "All"
 
+val PAYMENT_METHODS = listOf(
+    "Cash",
+    "UPI",
+    "Debit Card",
+    "Credit Card"
+)
+
 enum class DateRange(val label: String) {
     ALL_TIME("All time"),
     THIS_WEEK("This week"),

@@ -17,14 +17,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -51,38 +45,17 @@ fun ExpenseListScreen(
         mutableStateOf<List<Expense>>(emptyList())
     }
 
-    var searchQuery by remember {
-        mutableStateOf("")
+    var filters by remember {
+        mutableStateOf(ExpenseFilters())
     }
 
-    var selectedCategory by remember {
-        mutableStateOf("All")
-    }
-
-    var categoryExpanded by remember {
+    var showRangePicker by remember {
         mutableStateOf(false)
     }
 
     var householdCategories by remember {
         mutableStateOf<List<String>>(emptyList())
     }
-
-    val categories = listOf("All") + householdCategories
-
-    var selectedSort by remember {
-        mutableStateOf("Newest")
-    }
-
-    var sortExpanded by remember {
-        mutableStateOf(false)
-    }
-
-    val sortOptions = listOf(
-        "Newest",
-        "Oldest",
-        "Highest Amount",
-        "Lowest Amount"
-    )
 
     var expenseToDelete by remember {
         mutableStateOf<Expense?>(null)
@@ -112,37 +85,9 @@ fun ExpenseListScreen(
         )
     }
 
-    val searchedExpenses = if (searchQuery.isBlank()) {
-        expenses
-    } else {
-        expenses.filter {
-            it.description.contains(searchQuery, ignoreCase = true) ||
-                it.notes.contains(searchQuery, ignoreCase = true)
-        }
-    }
+    val visibleExpenses = expenses.applyFilters(filters)
 
-    val filteredExpenses = if (selectedCategory == "All") {
-        searchedExpenses
-    } else {
-        searchedExpenses.filter {
-            it.category == selectedCategory
-        }
-    }
-
-    val sortedExpenses = when (selectedSort) {
-        "Oldest" -> filteredExpenses.sortedBy {
-            it.date + it.time
-        }
-        "Highest Amount" -> filteredExpenses.sortedByDescending {
-            it.amount
-        }
-        "Lowest Amount" -> filteredExpenses.sortedBy {
-            it.amount
-        }
-        else -> filteredExpenses.sortedByDescending {
-            it.date + it.time
-        }
-    }
+    val visibleTotal = visibleExpenses.sumOf { it.amount }
 
     AppScaffold(
         title = "Expense List",
@@ -172,122 +117,43 @@ fun ExpenseListScreen(
             .padding(innerPadding)
     ) {
 
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = {
-                searchQuery = it
-            },
-            label = {
-                Text("Search")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+        ExpenseFilterBar(
+            filters = filters,
+            categories = householdCategories,
+            paymentMethods = PAYMENT_METHODS,
+            onFiltersChange = { filters = it },
+            onCustomRangeClick = { showRangePicker = true }
         )
 
-        ExposedDropdownMenuBox(
-            expanded = categoryExpanded,
-            onExpandedChange = {
-                categoryExpanded = it
-            },
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
+        FilterSummary(
+            count = visibleExpenses.size,
+            total = visibleTotal
+        )
 
-            OutlinedTextField(
-                value = selectedCategory,
-                onValueChange = {},
-                readOnly = true,
-                label = {
-                    Text("Category")
-                },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = categoryExpanded
-                    )
-                },
-                modifier = Modifier
-                    .menuAnchor(
-                        ExposedDropdownMenuAnchorType.PrimaryNotEditable
-                    )
-                    .fillMaxWidth()
-            )
-
-            DropdownMenu(
-                expanded = categoryExpanded,
-                onDismissRequest = {
-                    categoryExpanded = false
-                }
-            ) {
-
-                categories.forEach { item ->
-
-                    DropdownMenuItem(
-                        text = {
-                            Text(item)
-                        },
-                        onClick = {
-                            selectedCategory = item
-                            categoryExpanded = false
-                        }
-                    )
-                }
-            }
-        }
-
-        ExposedDropdownMenuBox(
-            expanded = sortExpanded,
-            onExpandedChange = {
-                sortExpanded = it
-            },
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
-
-            OutlinedTextField(
-                value = selectedSort,
-                onValueChange = {},
-                readOnly = true,
-                label = {
-                    Text("Sort")
-                },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = sortExpanded
-                    )
-                },
-                modifier = Modifier
-                    .menuAnchor(
-                        ExposedDropdownMenuAnchorType.PrimaryNotEditable
-                    )
-                    .fillMaxWidth()
-            )
-
-            DropdownMenu(
-                expanded = sortExpanded,
-                onDismissRequest = {
-                    sortExpanded = false
-                }
-            ) {
-
-                sortOptions.forEach { item ->
-
-                    DropdownMenuItem(
-                        text = {
-                            Text(item)
-                        },
-                        onClick = {
-                            selectedSort = item
-                            sortExpanded = false
-                        }
-                    )
-                }
-            }
-        }
-
-        if (sortedExpenses.isEmpty()) {
+        if (visibleExpenses.isEmpty()) {
 
             Text(
-                text = "No expenses found",
+                text = "No expenses match these filters",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        if (showRangePicker) {
+
+            DateRangePickerDialog(
+                initialStart = filters.customStart,
+                initialEnd = filters.customEnd,
+                onDismiss = { showRangePicker = false },
+                onConfirm = { start, end ->
+                    filters = filters.copy(
+                        dateRange = DateRange.CUSTOM,
+                        customStart = start,
+                        customEnd = end
+                    )
+                    showRangePicker = false
+                }
             )
         }
 
@@ -301,7 +167,7 @@ fun ExpenseListScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
-            items(sortedExpenses) { expense ->
+            items(visibleExpenses) { expense ->
 
                 val addedByLabel = when {
                     expense.addedBy.isBlank() -> ""
