@@ -49,6 +49,22 @@ fun ExpenseFilters.activeCount(): Int {
     return count
 }
 
+/** Chip label for the date filter, showing real dates for a custom range. */
+fun ExpenseFilters.dateLabel(): String {
+
+    val start = customStart
+    val end = customEnd
+
+    return when {
+        dateRange == DateRange.ALL_TIME -> "Any date"
+
+        dateRange == DateRange.CUSTOM && start != null && end != null ->
+            "${formatExpenseDate(start.toString())} - ${formatExpenseDate(end.toString())}"
+
+        else -> dateRange.label
+    }
+}
+
 fun ExpenseFilters.isDefault(): Boolean {
     return activeCount() == 0 && sort == ExpenseSort.NEWEST
 }

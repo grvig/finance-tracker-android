@@ -137,11 +137,7 @@ fun ExpenseFilterBar(
         ) {
 
             FilterChipMenu(
-                label = if (filters.dateRange == DateRange.ALL_TIME) {
-                    "Any date"
-                } else {
-                    filters.dateRange.label
-                },
+                label = filters.dateLabel(),
                 active = filters.dateRange != DateRange.ALL_TIME,
                 options = DateRange.entries.map { it.label },
                 onSelect = { index ->
