@@ -432,6 +432,10 @@ class MainActivity : ComponentActivity() {
                         MyExpensesScreen(
                             expenseViewModel = expenseViewModel,
                             householdViewModel = householdViewModel,
+                            onEditExpenseClick = { expense ->
+                                selectedExpense = expense
+                                navigateTo(Screen.EDIT_EXPENSE)
+                            },
                             onBack = {
                                 goBack()
                             },

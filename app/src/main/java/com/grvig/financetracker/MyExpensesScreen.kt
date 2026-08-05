@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
 import com.grvig.financetracker.viewmodel.HouseholdViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -26,11 +29,16 @@ fun MyExpensesScreen(
     expenseViewModel: ExpenseViewModel,
     householdViewModel: HouseholdViewModel,
     onBack: () -> Unit,
-    onOpenDrawer: () -> Unit
+    onOpenDrawer: () -> Unit,
+    onEditExpenseClick: (Expense) -> Unit
 ) {
 
     var expenses by remember {
         mutableStateOf<List<Expense>>(emptyList())
+    }
+
+    var expenseToDelete by remember {
+        mutableStateOf<Expense?>(null)
     }
 
     var filters by remember {
@@ -48,6 +56,12 @@ fun MyExpensesScreen(
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
     val scope = rememberCoroutineScope()
+
+    fun refreshExpenses() {
+        scope.launch {
+            expenses = expenseViewModel.getAllExpenses()
+        }
+    }
 
     LaunchedEffect(Unit) {
         scope.launch {
@@ -148,6 +162,47 @@ fun MyExpensesScreen(
                 )
             }
 
+            expenseToDelete?.let { expense ->
+
+                AlertDialog(
+                    onDismissRequest = {
+                        expenseToDelete = null
+                    },
+                    title = {
+                        Text("Delete Expense")
+                    },
+                    text = {
+                        Text("Are you sure you want to delete this expense?")
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+
+                                expenseViewModel.deleteExpense(expense)
+
+                                scope.launch {
+                                    delay(200)
+                                    refreshExpenses()
+                                }
+
+                                expenseToDelete = null
+                            }
+                        ) {
+                            Text("Delete")
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                expenseToDelete = null
+                            }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+
             LazyColumn(
                 contentPadding = PaddingValues(
                     start = 16.dp,
@@ -161,7 +216,9 @@ fun MyExpensesScreen(
 
                     ExpenseRow(
                         expense = expense,
-                        addedByLabel = ""
+                        addedByLabel = "",
+                        onEditClick = { onEditExpenseClick(expense) },
+                        onDeleteClick = { expenseToDelete = expense }
                     )
                 }
             }
