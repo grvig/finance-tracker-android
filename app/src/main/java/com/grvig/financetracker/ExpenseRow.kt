@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -83,6 +84,7 @@ fun ExpenseRow(
     addedByLabel: String,
     onEditClick: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
+    onShareClick: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -168,6 +170,20 @@ fun ExpenseRow(
                             color = muted,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                if (onShareClick != null) {
+                    IconButton(
+                        onClick = onShareClick,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Share,
+                            contentDescription = "Share expense",
+                            tint = muted,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }

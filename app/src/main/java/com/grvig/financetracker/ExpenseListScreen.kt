@@ -19,6 +19,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -58,6 +60,10 @@ fun ExpenseListScreen(
         mutableStateOf<List<String>>(emptyList())
     }
 
+    var expenseToShare by remember {
+        mutableStateOf<Expense?>(null)
+    }
+
     var expenseToDelete by remember {
         mutableStateOf<Expense?>(null)
     }
@@ -67,6 +73,10 @@ fun ExpenseListScreen(
     }
 
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
 
     val scope = rememberCoroutineScope()
 
@@ -180,7 +190,33 @@ fun ExpenseListScreen(
                     expense = expense,
                     addedByLabel = addedByLabel,
                     onEditClick = { onEditExpenseClick(expense) },
-                    onDeleteClick = { expenseToDelete = expense }
+                    onDeleteClick = { expenseToDelete = expense },
+                    onShareClick = { expenseToShare = expense }
+                )
+            }
+        }
+
+        expenseToShare?.let { expense ->
+
+            val sharedBy = when {
+                expense.addedBy.isBlank() -> ""
+                expense.addedBy == currentUserId -> "You"
+                else -> memberEmails[expense.addedBy] ?: "A household member"
+            }
+
+            SharePreviewDialog(
+                fileName = "expense.png",
+                subject = "Expense: ${formatMoneyFull(expense.amount)}",
+                onDismiss = { expenseToShare = null },
+                onError = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                }
+            ) {
+                ExpenseShareCard(
+                    expense = expense,
+                    addedByLabel = sharedBy
                 )
             }
         }
@@ -227,6 +263,8 @@ fun ExpenseListScreen(
                 }
             )
         }
+
+        SnackbarHost(hostState = snackbarHostState)
     }
     }
 }
