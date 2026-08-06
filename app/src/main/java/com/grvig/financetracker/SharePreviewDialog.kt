@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.grvig.financetracker.ui.theme.FinanceTrackerTheme
 import kotlinx.coroutines.launch
 
 /**
@@ -89,7 +90,11 @@ fun SharePreviewDialog(
                         drawLayer(graphicsLayer)
                     }
                 ) {
-                    card()
+                    // Always export the light card so the image stays readable
+                    // for the recipient, whatever theme the sender is using.
+                    FinanceTrackerTheme(darkTheme = false) {
+                        card()
+                    }
                 }
             }
 
