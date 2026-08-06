@@ -19,9 +19,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 /** Fixed width keeps the exported PNG a predictable size on every device. */
 val ShareCardWidth = 340.dp
+
+/** Turns a "2026-07" key into "July 2026" for the report header. */
+fun formatMonthLabel(raw: String): String {
+    return try {
+        LocalDate.parse("$raw-01")
+            .format(DateTimeFormatter.ofPattern("MMMM yyyy"))
+    } catch (e: Exception) {
+        raw
+    }
+}
 
 private fun fullDate(raw: String): String {
     return try {
@@ -155,6 +166,78 @@ fun ExpenseShareCard(
                     DetailRow("Notes", expense.notes)
                 }
             }
+        }
+
+        ShareCardFooter()
+    }
+}
+
+@Composable
+fun MonthlyReportShareCard(
+    monthLabel: String,
+    total: Double,
+    expenseCount: Int,
+    categoryTotals: List<Pair<String, Double>>,
+    modifier: Modifier = Modifier
+) {
+
+    Column(
+        modifier = modifier
+            .width(ShareCardWidth)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+
+        ShareCardHeader(monthLabel)
+
+        Column(
+            modifier = Modifier.padding(
+                start = 20.dp,
+                end = 20.dp,
+                top = 14.dp,
+                bottom = 8.dp
+            )
+        ) {
+
+            Text(
+                text = "Total spent",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Row(
+                modifier = Modifier.padding(top = 2.dp, bottom = 12.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+
+                Text(
+                    text = formatMoneyFull(total),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Text(
+                    text = "  across $expenseCount expense${if (expenseCount == 1) "" else "s"}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
+
+            HorizontalDivider()
+
+            Text(
+                text = "By category",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 10.dp)
+            )
+
+            CategoryBreakdownChart(
+                categoryTotals = categoryTotals,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
 
         ShareCardFooter()

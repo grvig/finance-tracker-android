@@ -7,8 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,6 +21,8 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -68,6 +74,14 @@ fun ReportsScreen(
 
     var monthExpanded by remember {
         mutableStateOf(false)
+    }
+
+    var showReportShare by remember {
+        mutableStateOf(false)
+    }
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
     }
 
     val scope = rememberCoroutineScope()
@@ -139,7 +153,18 @@ fun ReportsScreen(
     AppScaffold(
         title = "Reports",
         onBack = onBack,
-        onOpenDrawer = onOpenDrawer
+        onOpenDrawer = onOpenDrawer,
+        actions = {
+            IconButton(
+                enabled = monthExpenses.isNotEmpty(),
+                onClick = { showReportShare = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Share,
+                    contentDescription = "Share this report"
+                )
+            }
+        }
     ) { innerPadding ->
 
     Column(
@@ -278,6 +303,29 @@ fun ReportsScreen(
                     }
                 }
             }
+
+            if (showReportShare) {
+
+                SharePreviewDialog(
+                    fileName = "report-$selectedMonth.png",
+                    subject = "Spending report: ${formatMoneyFull(totalSpent)}",
+                    onDismiss = { showReportShare = false },
+                    onError = { message ->
+                        scope.launch {
+                            snackbarHostState.showSnackbar(message)
+                        }
+                    }
+                ) {
+                    MonthlyReportShareCard(
+                        monthLabel = formatMonthLabel(selectedMonth),
+                        total = totalSpent,
+                        expenseCount = totalCount,
+                        categoryTotals = categoryBreakdown
+                    )
+                }
+            }
+
+            SnackbarHost(hostState = snackbarHostState)
         }
     }
     }
