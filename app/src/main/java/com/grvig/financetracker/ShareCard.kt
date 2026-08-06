@@ -90,7 +90,7 @@ private fun DetailRow(
 private fun ShareCardFooter() {
 
     Text(
-        text = "Shared from Finance Tracker",
+        text = "Shared from Finance Tracker · ${formatFullDate(LocalDate.now())}",
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier
@@ -200,13 +200,25 @@ fun ExpenseSummaryShareCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Text(
-                text = formatMoneyFull(total),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
-            )
+            Row(
+                modifier = Modifier.padding(top = 2.dp, bottom = 12.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+
+                Text(
+                    text = formatMoneyFull(total),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Text(
+                    text = "  ${expenses.size} expense${if (expenses.size == 1) "" else "s"}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
 
             HorizontalDivider()
 
