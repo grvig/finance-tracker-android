@@ -10,9 +10,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -39,6 +45,18 @@ fun MyExpensesScreen(
 
     var expenseToDelete by remember {
         mutableStateOf<Expense?>(null)
+    }
+
+    var expenseToShare by remember {
+        mutableStateOf<Expense?>(null)
+    }
+
+    var showSummaryShare by remember {
+        mutableStateOf(false)
+    }
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
     }
 
     var filters by remember {
@@ -85,7 +103,18 @@ fun MyExpensesScreen(
     AppScaffold(
         title = "My Expenses",
         onBack = onBack,
-        onOpenDrawer = onOpenDrawer
+        onOpenDrawer = onOpenDrawer,
+        actions = {
+            IconButton(
+                enabled = myExpenses.isNotEmpty(),
+                onClick = { showSummaryShare = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Share,
+                    contentDescription = "Share these expenses"
+                )
+            }
+        }
     ) { innerPadding ->
 
         Column(
@@ -162,6 +191,48 @@ fun MyExpensesScreen(
                 )
             }
 
+            expenseToShare?.let { expense ->
+
+                SharePreviewDialog(
+                    fileName = "expense.png",
+                    subject = "Expense: ${formatMoneyFull(expense.amount)}",
+                    onDismiss = { expenseToShare = null },
+                    onError = { message ->
+                        scope.launch {
+                            snackbarHostState.showSnackbar(message)
+                        }
+                    }
+                ) {
+                    ExpenseShareCard(
+                        expense = expense,
+                        addedByLabel = "You"
+                    )
+                }
+            }
+
+            if (showSummaryShare) {
+
+                SharePreviewDialog(
+                    fileName = "my-expenses.png",
+                    subject = "My expenses: ${formatMoneyFull(myTotal)}",
+                    onDismiss = { showSummaryShare = false },
+                    onError = { message ->
+                        scope.launch {
+                            snackbarHostState.showSnackbar(message)
+                        }
+                    }
+                ) {
+                    ExpenseSummaryShareCard(
+                        title = "My expenses",
+                        subtitle = filters.describe(),
+                        expenses = myExpenses,
+                        total = myTotal
+                    )
+                }
+            }
+
+            SnackbarHost(hostState = snackbarHostState)
+
             expenseToDelete?.let { expense ->
 
                 AlertDialog(
@@ -218,7 +289,8 @@ fun MyExpensesScreen(
                         expense = expense,
                         addedByLabel = "",
                         onEditClick = { onEditExpenseClick(expense) },
-                        onDeleteClick = { expenseToDelete = expense }
+                        onDeleteClick = { expenseToDelete = expense },
+                        onShareClick = { expenseToShare = expense }
                     )
                 }
             }
