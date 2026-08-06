@@ -161,6 +161,9 @@ fun ExpenseShareCard(
     }
 }
 
+/** Beyond this the card gets too tall to read comfortably in a chat app. */
+private const val MAX_SHARED_ROWS = 12
+
 @Composable
 fun ExpenseSummaryShareCard(
     title: String,
@@ -169,6 +172,9 @@ fun ExpenseSummaryShareCard(
     total: Double,
     modifier: Modifier = Modifier
 ) {
+
+    val shown = expenses.take(MAX_SHARED_ROWS)
+    val hidden = expenses.size - shown.size
 
     Column(
         modifier = modifier
@@ -209,7 +215,7 @@ fun ExpenseSummaryShareCard(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
 
-                expenses.forEach { expense ->
+                shown.forEach { expense ->
 
                     Row(modifier = Modifier.fillMaxWidth()) {
 
@@ -242,6 +248,14 @@ fun ExpenseSummaryShareCard(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
+                }
+
+                if (hidden > 0) {
+                    Text(
+                        text = "+ $hidden more expense${if (hidden == 1) "" else "s"}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }

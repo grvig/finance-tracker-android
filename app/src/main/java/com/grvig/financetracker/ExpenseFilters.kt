@@ -65,6 +65,23 @@ fun ExpenseFilters.dateLabel(): String {
     }
 }
 
+/** Human readable summary of the active filters, for share cards. */
+fun ExpenseFilters.describe(): String {
+
+    val parts = mutableListOf<String>()
+
+    if (dateRange != DateRange.ALL_TIME) parts.add(dateLabel())
+    if (category != FILTER_ALL) parts.add(category)
+    if (paymentMethod != FILTER_ALL) parts.add(paymentMethod)
+    if (search.isNotBlank()) parts.add("\"$search\"")
+
+    return if (parts.isEmpty()) {
+        "All expenses"
+    } else {
+        parts.joinToString(" · ")
+    }
+}
+
 fun ExpenseFilters.isDefault(): Boolean {
     return activeCount() == 0 && sort == ExpenseSort.NEWEST
 }

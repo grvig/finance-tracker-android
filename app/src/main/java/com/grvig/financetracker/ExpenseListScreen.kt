@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -64,6 +65,10 @@ fun ExpenseListScreen(
         mutableStateOf<Expense?>(null)
     }
 
+    var showSummaryShare by remember {
+        mutableStateOf(false)
+    }
+
     var expenseToDelete by remember {
         mutableStateOf<Expense?>(null)
     }
@@ -105,6 +110,17 @@ fun ExpenseListScreen(
         onBack = onBack,
         onOpenDrawer = onOpenDrawer,
         actions = {
+
+            IconButton(
+                enabled = visibleExpenses.isNotEmpty(),
+                onClick = { showSummaryShare = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Share,
+                    contentDescription = "Share these expenses"
+                )
+            }
+
             IconButton(onClick = { refreshExpenses() }) {
                 Icon(
                     imageVector = Icons.Filled.Refresh,
@@ -217,6 +233,27 @@ fun ExpenseListScreen(
                 ExpenseShareCard(
                     expense = expense,
                     addedByLabel = sharedBy
+                )
+            }
+        }
+
+        if (showSummaryShare) {
+
+            SharePreviewDialog(
+                fileName = "expenses.png",
+                subject = "Expenses: ${formatMoneyFull(visibleTotal)}",
+                onDismiss = { showSummaryShare = false },
+                onError = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                }
+            ) {
+                ExpenseSummaryShareCard(
+                    title = "Household expenses",
+                    subtitle = filters.describe(),
+                    expenses = visibleExpenses,
+                    total = visibleTotal
                 )
             }
         }
