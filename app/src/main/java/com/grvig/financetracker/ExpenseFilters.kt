@@ -12,6 +12,11 @@ val PAYMENT_METHODS = listOf(
     "Credit Card"
 )
 
+/** Only card payments have a card to name. */
+fun paymentMethodUsesCard(method: String): Boolean {
+    return method == "Debit Card" || method == "Credit Card"
+}
+
 enum class DateRange(val label: String) {
     ALL_TIME("All time"),
     THIS_WEEK("This week"),
