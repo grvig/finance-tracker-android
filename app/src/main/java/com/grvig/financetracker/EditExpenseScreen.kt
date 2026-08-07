@@ -55,6 +55,10 @@ fun EditExpenseScreen(
         mutableStateOf(expense.paymentMethod)
     }
 
+    var cardName by remember {
+        mutableStateOf(expense.cardName ?: "")
+    }
+
     var description by remember {
         mutableStateOf(expense.description)
     }
@@ -95,12 +99,7 @@ fun EditExpenseScreen(
         )
     }
 
-    val paymentMethods = listOf(
-        "Cash",
-        "UPI",
-        "Debit Card",
-        "Credit Card"
-    )
+    val paymentMethods = PAYMENT_METHODS
 
     val snackbarHostState = remember {
         SnackbarHostState()
@@ -229,6 +228,18 @@ fun EditExpenseScreen(
             }
         }
 
+        if (paymentMethodUsesCard(paymentMethod)) {
+
+            OutlinedTextField(
+                value = cardName,
+                onValueChange = { cardName = it },
+                label = { Text("Card name") },
+                placeholder = { Text("e.g. HDFC Regalia") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
         DateField(
             date = selectedDate,
             onClick = { showDatePicker = true }
@@ -309,6 +320,11 @@ fun EditExpenseScreen(
                             amount = amountValue,
                             category = category,
                             paymentMethod = paymentMethod,
+                            cardName = if (paymentMethodUsesCard(paymentMethod)) {
+                                cardName.trim().ifBlank { null }
+                            } else {
+                                null
+                            },
                             description = description,
                             notes = notes,
                             date = selectedDate.toString()
