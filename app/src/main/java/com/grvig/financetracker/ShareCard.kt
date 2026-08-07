@@ -155,11 +155,20 @@ fun ExpenseShareCard(
 
                 DetailRow("Category", expense.category)
                 DetailRow("Payment", expense.paymentMethod)
+
+                expense.cardName
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { DetailRow("Card", it) }
+
                 DetailRow("Date", fullDate(expense.date))
                 DetailRow("Time", formatExpenseTime(expense.time))
 
                 if (addedByLabel.isNotBlank()) {
                     DetailRow("Added by", addedByLabel)
+                }
+
+                if (expense.isRecurring) {
+                    DetailRow("Recurring", "Yes")
                 }
 
                 if (expense.notes.isNotBlank()) {

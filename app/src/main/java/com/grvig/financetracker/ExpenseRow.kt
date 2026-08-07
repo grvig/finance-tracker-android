@@ -127,9 +127,14 @@ fun ExpenseRow(
                         CategoryChip(category = expense.category)
 
                         Text(
-                            text = expense.paymentMethod,
+                            text = expense.cardName
+                                ?.takeIf { it.isNotBlank() }
+                                ?.let { "${expense.paymentMethod} · $it" }
+                                ?: expense.paymentMethod,
                             style = MaterialTheme.typography.labelSmall,
-                            color = muted
+                            color = muted,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
