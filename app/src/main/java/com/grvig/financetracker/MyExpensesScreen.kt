@@ -226,7 +226,8 @@ fun MyExpensesScreen(
                         title = "My expenses",
                         subtitle = filters.describe(),
                         expenses = myExpenses,
-                        total = myTotal
+                        total = myTotal,
+                        addedByLabel = { "You" }
                     )
                 }
             }

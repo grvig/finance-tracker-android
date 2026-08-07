@@ -262,7 +262,8 @@ fun ExpenseSummaryShareCard(
     subtitle: String,
     expenses: List<Expense>,
     total: Double,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    addedByLabel: (Expense) -> String = { "" }
 ) {
 
     val shown = expenses.take(MAX_SHARED_ROWS)
@@ -332,8 +333,13 @@ fun ExpenseSummaryShareCard(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
 
+                            val payment = expense.cardName
+                                ?.takeIf { it.isNotBlank() }
+                                ?.let { "${expense.paymentMethod} · $it" }
+                                ?: expense.paymentMethod
+
                             Text(
-                                text = "${expense.category} · ${expense.paymentMethod}",
+                                text = "${expense.category} · $payment",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -343,6 +349,16 @@ fun ExpenseSummaryShareCard(
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+
+                            val who = addedByLabel(expense)
+
+                            if (who.isNotBlank()) {
+                                Text(
+                                    text = "by $who",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
 
                         Text(

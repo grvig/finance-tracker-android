@@ -253,7 +253,14 @@ fun ExpenseListScreen(
                     title = "Household expenses",
                     subtitle = filters.describe(),
                     expenses = visibleExpenses,
-                    total = visibleTotal
+                    total = visibleTotal,
+                    addedByLabel = { expense ->
+                        when {
+                            expense.addedBy.isBlank() -> ""
+                            expense.addedBy == currentUserId -> "You"
+                            else -> memberEmails[expense.addedBy] ?: "a member"
+                        }
+                    }
                 )
             }
         }
