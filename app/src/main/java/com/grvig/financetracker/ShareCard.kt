@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
+import com.grvig.financetracker.data.RecurringExpense
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -174,6 +175,74 @@ fun ExpenseShareCard(
 
                 if (expense.notes.isNotBlank()) {
                     DetailRow("Notes", expense.notes)
+                }
+            }
+        }
+
+        ShareCardFooter()
+    }
+}
+
+@Composable
+fun RecurringExpenseShareCard(
+    recurringExpense: RecurringExpense,
+    addedByLabel: String,
+    modifier: Modifier = Modifier
+) {
+
+    Column(
+        modifier = modifier
+            .width(ShareCardWidth)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+
+        ShareCardHeader("Recurring expense")
+
+        Column(
+            modifier = Modifier.padding(
+                start = 20.dp,
+                end = 20.dp,
+                top = 16.dp,
+                bottom = 8.dp
+            )
+        ) {
+
+            Text(
+                text = recurringExpense.title.ifBlank { recurringExpense.category },
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                text = formatMoneyFull(recurringExpense.amount),
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+            )
+
+            HorizontalDivider()
+
+            Column(modifier = Modifier.padding(top = 10.dp)) {
+
+                DetailRow("Category", recurringExpense.category)
+                DetailRow("Payment", recurringExpense.paymentMethod)
+
+                recurringExpense.cardName
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { DetailRow("Card", it) }
+
+                DetailRow("Frequency", recurringExpense.frequency)
+                DetailRow("Next due", fullDate(recurringExpense.nextDueDate))
+                DetailRow("Status", if (recurringExpense.isActive) "Active" else "Paused")
+
+                if (addedByLabel.isNotBlank()) {
+                    DetailRow("Added by", addedByLabel)
+                }
+
+                if (recurringExpense.notes.isNotBlank()) {
+                    DetailRow("Notes", recurringExpense.notes)
                 }
             }
         }

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
@@ -108,6 +109,10 @@ fun RecurringExpensesScreen(
     }
 
     var recurringExpenseToDelete by remember {
+        mutableStateOf<RecurringExpense?>(null)
+    }
+
+    var recurringExpenseToShare by remember {
         mutableStateOf<RecurringExpense?>(null)
     }
 
@@ -560,6 +565,20 @@ fun RecurringExpensesScreen(
 
                             IconButton(
                                 onClick = {
+                                    recurringExpenseToShare = recurringExpense
+                                },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Share,
+                                    contentDescription = "Share recurring expense",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
 
                                     title = recurringExpense.title
                                     amount = recurringExpense.amount.toString()
@@ -595,6 +614,31 @@ fun RecurringExpensesScreen(
                         }
                     }
                 }
+            }
+        }
+
+        recurringExpenseToShare?.let { recurringExpense ->
+
+            val sharedBy = when {
+                recurringExpense.addedBy.isBlank() -> ""
+                recurringExpense.addedBy == currentUserId -> "You"
+                else -> memberEmails[recurringExpense.addedBy] ?: "A household member"
+            }
+
+            SharePreviewDialog(
+                fileName = "recurring-expense.png",
+                subject = "Recurring: ${formatMoneyFull(recurringExpense.amount)}",
+                onDismiss = { recurringExpenseToShare = null },
+                onError = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                }
+            ) {
+                RecurringExpenseShareCard(
+                    recurringExpense = recurringExpense,
+                    addedByLabel = sharedBy
+                )
             }
         }
 
