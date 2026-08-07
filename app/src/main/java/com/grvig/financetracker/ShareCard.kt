@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
 import java.time.LocalDate
@@ -187,6 +188,7 @@ fun MonthlyReportShareCard(
     total: Double,
     expenseCount: Int,
     categoryTotals: List<Pair<String, Double>>,
+    memberTotals: List<Pair<String, Double>> = emptyList(),
     modifier: Modifier = Modifier
 ) {
 
@@ -247,6 +249,44 @@ fun MonthlyReportShareCard(
                 categoryTotals = categoryTotals,
                 modifier = Modifier.padding(top = 4.dp)
             )
+
+            if (memberTotals.isNotEmpty()) {
+
+                HorizontalDivider(modifier = Modifier.padding(top = 12.dp))
+
+                Text(
+                    text = "By member",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 10.dp, bottom = 4.dp)
+                )
+
+                memberTotals.forEach { (member, amount) ->
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 3.dp)
+                    ) {
+
+                        Text(
+                            text = member,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Text(
+                            text = formatMoneyFull(amount),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
         }
 
         ShareCardFooter()

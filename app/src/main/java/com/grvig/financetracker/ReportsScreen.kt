@@ -320,7 +320,17 @@ fun ReportsScreen(
                         monthLabel = formatMonthLabel(selectedMonth),
                         total = totalSpent,
                         expenseCount = totalCount,
-                        categoryTotals = categoryBreakdown
+                        categoryTotals = categoryBreakdown,
+                        memberTotals = memberBreakdown.map { (memberId, amount) ->
+
+                            val label = when {
+                                memberId.isBlank() -> "Unknown"
+                                memberId == currentUserId -> "You"
+                                else -> memberEmails[memberId] ?: "a member"
+                            }
+
+                            label to amount
+                        }
                     )
                 }
             }
