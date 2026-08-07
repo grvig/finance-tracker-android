@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
@@ -85,6 +86,10 @@ fun BudgetScreen(
     }
 
     var budgetToDelete by remember {
+        mutableStateOf<Budget?>(null)
+    }
+
+    var budgetToShare by remember {
         mutableStateOf<Budget?>(null)
     }
 
@@ -390,6 +395,20 @@ fun BudgetScreen(
 
                             IconButton(
                                 onClick = {
+                                    budgetToShare = budget
+                                },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Share,
+                                    contentDescription = "Share budget",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
 
                                     category = budget.category
 
@@ -440,6 +459,26 @@ fun BudgetScreen(
                         }
                     }
                 }
+            }
+        }
+
+        budgetToShare?.let { budget ->
+
+            SharePreviewDialog(
+                fileName = "budget.png",
+                subject = "${budget.category} budget",
+                onDismiss = { budgetToShare = null },
+                onError = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                }
+            ) {
+                BudgetShareCard(
+                    budget = budget,
+                    spent = spentForCategory(budget.category),
+                    monthLabel = formatMonthLabel(currentMonth)
+                )
             }
         }
 

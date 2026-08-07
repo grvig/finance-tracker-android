@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.grvig.financetracker.data.Budget
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.data.RecurringExpense
 import java.time.LocalDate
@@ -176,6 +177,85 @@ fun ExpenseShareCard(
                 if (expense.notes.isNotBlank()) {
                     DetailRow("Notes", expense.notes)
                 }
+            }
+        }
+
+        ShareCardFooter()
+    }
+}
+
+@Composable
+fun BudgetShareCard(
+    budget: Budget,
+    spent: Double,
+    monthLabel: String,
+    modifier: Modifier = Modifier
+) {
+
+    val percent = if (budget.monthlyLimit > 0) {
+        ((spent / budget.monthlyLimit) * 100).toInt()
+    } else {
+        0
+    }
+
+    val remaining = budget.monthlyLimit - spent
+
+    Column(
+        modifier = modifier
+            .width(ShareCardWidth)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+
+        ShareCardHeader("${budget.category} budget")
+
+        Column(
+            modifier = Modifier.padding(
+                start = 20.dp,
+                end = 20.dp,
+                top = 16.dp,
+                bottom = 8.dp
+            )
+        ) {
+
+            Text(
+                text = monthLabel,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Row(
+                modifier = Modifier.padding(top = 2.dp, bottom = 10.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+
+                Text(
+                    text = formatMoneyFull(spent),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Text(
+                    text = "  of ${formatMoneyFull(budget.monthlyLimit)}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
+
+            BudgetProgressBar(percent = percent)
+
+            Column(modifier = Modifier.padding(top = 12.dp)) {
+
+                DetailRow("Used", "$percent%")
+
+                DetailRow(
+                    label = if (remaining >= 0) "Remaining" else "Over by",
+                    value = formatMoneyFull(kotlin.math.abs(remaining))
+                )
+
+                DetailRow("Warn at", "${budget.warningPercent}%")
             }
         }
 
