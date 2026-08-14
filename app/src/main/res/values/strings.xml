@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Finance Tracker</string>
+    <string name="widget_add_expense_label">+ Add Expense</string>
+    <string name="widget_add_expense_description">Jump straight to adding an expense</string>
+    <string name="shortcut_add_expense_short">Add Expense</string>
+    <string name="shortcut_add_expense_long">Add a new expense</string>
 </resources>
