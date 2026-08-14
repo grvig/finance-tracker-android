@@ -99,7 +99,12 @@ class MainActivity : ComponentActivity() {
         )[HouseholdViewModel::class.java]
 
         setContent {
-            FinanceTrackerTheme {
+
+            var themeMode by remember {
+                mutableStateOf(ThemePreference.load(this))
+            }
+
+            FinanceTrackerTheme(themeMode = themeMode) {
 
                 val backStack = remember {
                     mutableStateListOf(
@@ -448,6 +453,11 @@ class MainActivity : ComponentActivity() {
                         HouseholdInfoScreen(
                             householdViewModel = householdViewModel,
                             userId = authViewModel.currentUser?.uid ?: "",
+                            themeMode = themeMode,
+                            onThemeModeChange = { mode ->
+                                themeMode = mode
+                                ThemePreference.save(this@MainActivity, mode)
+                            },
                             onBack = {
                                 goBack()
                             },
