@@ -16,8 +16,6 @@
                 android:name="open_add_expense"
                 android:value="true" />
         </intent>
-
-        <categories android:name="android.shortcut.conversation" />
     </shortcut>
 
 </shortcuts>
