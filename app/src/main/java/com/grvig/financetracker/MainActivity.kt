@@ -1,5 +1,6 @@
 package com.grvig.financetracker
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -35,14 +36,34 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
+    /**
+     * Set when the widget launches us. Consumed once the household has
+     * resolved, since routing before that would land on a screen with no
+     * household id.
+     */
+    private var pendingAddExpense by mutableStateOf(false)
+
     private lateinit var expenseViewModel: ExpenseViewModel
     private lateinit var budgetViewModel: BudgetViewModel
     private lateinit var recurringExpenseViewModel: RecurringExpenseViewModel
     private lateinit var authViewModel: AuthViewModel
     private lateinit var householdViewModel: HouseholdViewModel
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getBooleanExtra(AddExpenseWidget.EXTRA_OPEN_ADD_EXPENSE, false)) {
+            pendingAddExpense = true
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        pendingAddExpense = intent.getBooleanExtra(
+            AddExpenseWidget.EXTRA_OPEN_ADD_EXPENSE,
+            false
+        )
 
         val repository = ExpenseRepository()
 
@@ -144,6 +165,26 @@ class MainActivity : ComponentActivity() {
 
                 BackHandler(enabled = backStack.size > 1) {
                     goBack()
+                }
+
+                // Handles both a cold launch (fires once LOADING resolves to a
+                // real screen) and a warm one (fires when onNewIntent flips the
+                // flag). Waits for a household so we never land on Add Expense
+                // without one.
+                LaunchedEffect(pendingAddExpense, currentScreen) {
+
+                    val ready = currentScreen != Screen.LOADING &&
+                        currentScreen != Screen.LOGIN &&
+                        currentScreen != Screen.SIGNUP &&
+                        currentScreen != Screen.HOUSEHOLD_SETUP &&
+                        SessionManager.currentHouseholdId.isNotBlank()
+
+                    if (pendingAddExpense && ready) {
+                        pendingAddExpense = false
+                        if (currentScreen != Screen.ADD_EXPENSE) {
+                            navigateTo(Screen.ADD_EXPENSE)
+                        }
+                    }
                 }
 
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
