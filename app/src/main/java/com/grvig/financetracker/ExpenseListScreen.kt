@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -30,7 +29,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
 import com.grvig.financetracker.viewmodel.HouseholdViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,9 +43,7 @@ fun ExpenseListScreen(
     initialCategory: String = FILTER_ALL
 ) {
 
-    var expenses by remember {
-        mutableStateOf<List<Expense>>(emptyList())
-    }
+    val expenses by expenseViewModel.expenses.collectAsState()
 
     var filters by remember {
         mutableStateOf(ExpenseFilters(category = initialCategory))
@@ -85,14 +81,7 @@ fun ExpenseListScreen(
 
     val scope = rememberCoroutineScope()
 
-    fun refreshExpenses() {
-        scope.launch {
-            expenses = expenseViewModel.getAllExpenses()
-        }
-    }
-
     LaunchedEffect(Unit) {
-        refreshExpenses()
         memberEmails = householdViewModel.getMemberEmails(
             SessionManager.currentHouseholdId
         )
@@ -121,12 +110,6 @@ fun ExpenseListScreen(
                 )
             }
 
-            IconButton(onClick = { refreshExpenses() }) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = "Refresh"
-                )
-            }
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddExpenseClick) {
@@ -284,11 +267,6 @@ fun ExpenseListScreen(
                             expenseViewModel.deleteExpense(
                                 expense
                             )
-
-                            scope.launch {
-                                delay(200)
-                                refreshExpenses()
-                            }
 
                             expenseToDelete = null
                         }

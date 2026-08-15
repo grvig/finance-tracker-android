@@ -27,7 +27,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
 import com.grvig.financetracker.viewmodel.HouseholdViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -39,9 +38,7 @@ fun MyExpensesScreen(
     onEditExpenseClick: (Expense) -> Unit
 ) {
 
-    var expenses by remember {
-        mutableStateOf<List<Expense>>(emptyList())
-    }
+    val expenses by expenseViewModel.expenses.collectAsState()
 
     var expenseToDelete by remember {
         mutableStateOf<Expense?>(null)
@@ -75,15 +72,8 @@ fun MyExpensesScreen(
 
     val scope = rememberCoroutineScope()
 
-    fun refreshExpenses() {
-        scope.launch {
-            expenses = expenseViewModel.getAllExpenses()
-        }
-    }
-
     LaunchedEffect(Unit) {
         scope.launch {
-            expenses = expenseViewModel.getAllExpenses()
             householdCategories = householdViewModel.getCategories(
                 SessionManager.currentHouseholdId
             )
@@ -251,11 +241,6 @@ fun MyExpensesScreen(
                             onClick = {
 
                                 expenseViewModel.deleteExpense(expense)
-
-                                scope.launch {
-                                    delay(200)
-                                    refreshExpenses()
-                                }
 
                                 expenseToDelete = null
                             }
