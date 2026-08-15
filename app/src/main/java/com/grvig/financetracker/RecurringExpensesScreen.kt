@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -100,9 +99,9 @@ fun RecurringExpensesScreen(
         "Monthly"
     )
 
-    var recurringExpenses by remember {
-        mutableStateOf<List<RecurringExpense>>(emptyList())
-    }
+    val recurringExpenses by recurringExpenseViewModel
+        .recurringExpenses
+        .collectAsState()
 
     var editingRecurringExpense by remember {
         mutableStateOf<RecurringExpense?>(null)
@@ -128,15 +127,7 @@ fun RecurringExpensesScreen(
 
     val scope = rememberCoroutineScope()
 
-    fun refreshRecurringExpenses() {
-        scope.launch {
-            recurringExpenses =
-                recurringExpenseViewModel.getAllRecurringExpenses()
-        }
-    }
-
     LaunchedEffect(Unit) {
-        refreshRecurringExpenses()
         memberEmails = householdViewModel.getMemberEmails(
             SessionManager.currentHouseholdId
         )
@@ -151,15 +142,7 @@ fun RecurringExpensesScreen(
     AppScaffold(
         title = "Recurring Expenses",
         onBack = onBack,
-        onOpenDrawer = onOpenDrawer,
-        actions = {
-            IconButton(onClick = { refreshRecurringExpenses() }) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = "Refresh"
-                )
-            }
-        }
+        onOpenDrawer = onOpenDrawer
     ) { innerPadding ->
 
     Column(
@@ -389,11 +372,6 @@ fun RecurringExpensesScreen(
                         )
                     }
 
-                    scope.launch {
-                        kotlinx.coroutines.delay(200)
-                        refreshRecurringExpenses()
-                    }
-
                     title = ""
                     amount = ""
                     notes = ""
@@ -550,11 +528,6 @@ fun RecurringExpensesScreen(
                                             isActive = !recurringExpense.isActive
                                         )
                                     )
-
-                                    scope.launch {
-                                        kotlinx.coroutines.delay(200)
-                                        refreshRecurringExpenses()
-                                    }
                                 }
                             ) {
                                 Text(
@@ -661,10 +634,6 @@ fun RecurringExpensesScreen(
                             recurringExpenseViewModel.deleteRecurringExpense(
                                 recurringExpense
                             )
-
-                            scope.launch {
-                                refreshRecurringExpenses()
-                            }
 
                             recurringExpenseToDelete = null
                         }

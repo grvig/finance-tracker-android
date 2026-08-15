@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -75,12 +74,9 @@ fun BudgetScreen(
         mutableStateOf("")
     }
 
-    var budgets by remember {
-        mutableStateOf<List<Budget>>(emptyList())
-    }
-    var expenses by remember {
-        mutableStateOf<List<Expense>>(emptyList())
-    }
+    val budgets by budgetViewModel.budgets.collectAsState()
+    val expenses by expenseViewModel.expenses.collectAsState()
+
     var editingBudget by remember {
         mutableStateOf<Budget?>(null)
     }
@@ -99,21 +95,7 @@ fun BudgetScreen(
 
     val scope = rememberCoroutineScope()
 
-    fun refreshBudgets() {
-        scope.launch {
-            budgets = budgetViewModel.getAllBudgets()
-        }
-    }
-
-    fun refreshExpenses() {
-        scope.launch {
-            expenses = expenseViewModel.getAllExpenses()
-        }
-    }
-
     LaunchedEffect(Unit) {
-        refreshBudgets()
-        refreshExpenses()
         categories = householdViewModel.getCategories(
             SessionManager.currentHouseholdId
         )
@@ -142,20 +124,7 @@ fun BudgetScreen(
     AppScaffold(
         title = "Budget Tracking",
         onBack = onBack,
-        onOpenDrawer = onOpenDrawer,
-        actions = {
-            IconButton(
-                onClick = {
-                    refreshBudgets()
-                    refreshExpenses()
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = "Refresh"
-                )
-            }
-        }
+        onOpenDrawer = onOpenDrawer
     ) { innerPadding ->
 
     Column(
@@ -270,24 +239,9 @@ fun BudgetScreen(
                     }
 
                     if (editingBudget != null) {
-
-                        budgetViewModel.updateBudget(
-                            budget
-                        )
-                        scope.launch {
-                            kotlinx.coroutines.delay(200)
-                            refreshBudgets()
-                        }
-
+                        budgetViewModel.updateBudget(budget)
                     } else {
-
-                        budgetViewModel.insertBudget(
-                            budget
-                        )
-                        scope.launch {
-                            kotlinx.coroutines.delay(200)
-                            refreshBudgets()
-                        }
+                        budgetViewModel.insertBudget(budget)
                     }
                     Log.d(
                         "FinanceTracker",
@@ -501,10 +455,6 @@ fun BudgetScreen(
                             budgetViewModel.deleteBudget(
                                 budget
                             )
-
-                            scope.launch {
-                                refreshBudgets()
-                            }
 
                             budgetToDelete = null
                         }
