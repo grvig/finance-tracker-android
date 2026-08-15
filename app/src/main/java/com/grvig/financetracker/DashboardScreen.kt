@@ -72,15 +72,12 @@ onSignOutClick: () -> Unit,
 onOpenDrawer: () -> Unit
 ) {
 
-    var expenses by remember {
-        mutableStateOf<List<Expense>>(emptyList())
-    }
-    var budgets by remember {
-        mutableStateOf<List<Budget>>(emptyList())
-    }
-    var recurringExpenses by remember {
-        mutableStateOf<List<RecurringExpense>>(emptyList())
-    }
+    val expenses by expenseViewModel.expenses.collectAsState()
+    val budgets by budgetViewModel.budgets.collectAsState()
+    val recurringExpenses by recurringExpenseViewModel
+        .recurringExpenses
+        .collectAsState()
+
     var memberCount by remember {
         mutableStateOf(0)
     }
@@ -123,12 +120,6 @@ onOpenDrawer: () -> Unit
                 )
             }
 
-            kotlinx.coroutines.delay(200)
-
-            expenses = expenseViewModel.getAllExpenses()
-            budgets = budgetViewModel.getAllBudgets()
-            recurringExpenses =
-                recurringExpenseViewModel.getAllRecurringExpenses()
             memberCount = householdViewModel.getHousehold(
                 SessionManager.currentHouseholdId
             )?.memberIds?.size ?: 0

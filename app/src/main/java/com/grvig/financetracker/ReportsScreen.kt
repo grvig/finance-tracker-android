@@ -47,13 +47,8 @@ fun ReportsScreen(
     onCategoryClick: (String) -> Unit
 ) {
 
-    var expenses by remember {
-        mutableStateOf<List<Expense>>(emptyList())
-    }
-
-    var budgets by remember {
-        mutableStateOf<List<Budget>>(emptyList())
-    }
+    val expenses by expenseViewModel.expenses.collectAsState()
+    val budgets by budgetViewModel.budgets.collectAsState()
 
     var memberEmails by remember {
         mutableStateOf<Map<String, String>>(emptyMap())
@@ -88,8 +83,6 @@ fun ReportsScreen(
 
     LaunchedEffect(Unit) {
         scope.launch {
-            expenses = expenseViewModel.getAllExpenses()
-            budgets = budgetViewModel.getAllBudgets()
             memberEmails = householdViewModel.getMemberEmails(
                 SessionManager.currentHouseholdId
             )
