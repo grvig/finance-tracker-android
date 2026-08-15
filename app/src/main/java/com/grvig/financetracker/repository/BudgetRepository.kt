@@ -3,11 +3,43 @@ package com.grvig.financetracker.repository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.grvig.financetracker.SessionManager
 import com.grvig.financetracker.data.Budget
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class BudgetRepository {
 
     private val db = FirebaseFirestore.getInstance()
+
+    /** Emits again on every remote change. See ExpenseRepository.observeExpenses. */
+    fun observeBudgets(householdId: String): Flow<List<Budget>> = callbackFlow {
+
+        if (householdId.isBlank()) {
+            trySend(emptyList())
+            awaitClose { }
+            return@callbackFlow
+        }
+
+        val registration = db.collection("households")
+            .document(householdId)
+            .collection("budgets")
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+
+                trySend(
+                    snapshot?.documents?.mapNotNull {
+                        it.toObject(Budget::class.java)
+                    } ?: emptyList()
+                )
+            }
+
+        awaitClose { registration.remove() }
+    }
 
     private fun budgets() =
         db.collection("households")
