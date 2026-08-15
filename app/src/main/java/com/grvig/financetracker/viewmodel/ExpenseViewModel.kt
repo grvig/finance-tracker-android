@@ -55,7 +55,4 @@ class ExpenseViewModel(
         }
     }
 
-    suspend fun getAllExpenses(): List<Expense> {
-        return repository.getAllExpenses()
-    }
 }

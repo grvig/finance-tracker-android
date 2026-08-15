@@ -89,18 +89,4 @@ class ExpenseRepository {
         awaitClose { registration.remove() }
     }
 
-    suspend fun getAllExpenses():
-            List<Expense> {
-        return try {
-            expenses()
-                .get()
-                .await()
-                .documents
-                .mapNotNull {
-                    it.toObject(Expense::class.java)
-                }
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
 }

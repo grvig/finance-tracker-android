@@ -84,18 +84,4 @@ class BudgetRepository {
         }
     }
 
-    suspend fun getAllBudgets():
-            List<Budget> {
-        return try {
-            budgets()
-                .get()
-                .await()
-                .documents
-                .mapNotNull {
-                    it.toObject(Budget::class.java)
-                }
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
 }

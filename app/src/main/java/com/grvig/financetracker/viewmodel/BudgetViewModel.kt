@@ -51,8 +51,4 @@ class BudgetViewModel(
         }
     }
 
-    suspend fun getAllBudgets():
-            List<Budget> {
-        return repository.getAllBudgets()
-    }
 }
