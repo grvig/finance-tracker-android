@@ -1,120 +1,104 @@
-<div align="center">
-
 # Finance Tracker
 
-**A shared expense tracker for a household.**
-Two to four people log what they spend, and everyone sees the same numbers on their own phone — updated live.
+An Android expense tracker shared by a household. Two to four people record what they spend and everyone sees the same data on their own phone, updated live.
 
-![Platform](https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white)
-![Min SDK](https://img.shields.io/badge/min%20SDK-26-2E7D32)
-![Kotlin](https://img.shields.io/badge/Kotlin-2.2-7F52FF?logo=kotlin&logoColor=white)
-![Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4)
+<p>
+  <img src="screenshots/dashboard.png" width="250" alt="Dashboard showing the monthly total, budget progress and a category breakdown" />
+  <img src="screenshots/expenses.png" width="250" alt="Expense list with the search and filter bar" />
+  <img src="screenshots/dark-mode.png" width="250" alt="The dashboard in dark mode" />
+</p>
 
-<img src="screenshots/dashboard.png" width="260" alt="Dashboard showing the monthly total, budget progress and a category breakdown" />
-<img src="screenshots/expenses.png" width="260" alt="Expense list with the search and filter bar" />
-<img src="screenshots/dark-mode.png" width="260" alt="The dashboard in dark mode" />
+[Download the latest APK](https://github.com/grvig/finance-tracker-android/releases/latest) (Android 8.0 or newer)
 
-### [⬇ Download the latest APK](https://github.com/grvig/finance-tracker-android/releases/latest)
-
-<sub>Requires Android 8.0 (API 26) or newer</sub>
-
-</div>
-
----
-
-I built this for my own family, so it optimises for a small trusted group rather than for scale. There's no ledger and no settling up — just a straight answer to *"what did we spend this month, and on what?"*
+I wrote this for my own family, so it assumes a small group of people who trust each other. There is no per-person ledger and no settling up. It answers one question: where did the money go this month.
 
 ## Features
 
-### Shared, and live
+### Households
 
-Sign in with an email, then create a household or join one with a six-character code. Everything is scoped to that household.
+Sign in with an email, then create a household or join one with a six character code. Expenses, budgets, categories and recurring bills all belong to the household rather than to an individual, and every expense records who entered it.
 
-When one person adds an expense, it appears on everyone else's phone straight away. Screens read from Firestore snapshot listeners rather than one-shot fetches, so there is no refresh button anywhere in the app.
+### Live updates
 
-### Expenses worth searching
+Screens read from Firestore snapshot listeners instead of one-shot fetches. An expense added on one phone shows up on the others within a second, so the app has no refresh button.
 
-Every expense records amount, category, payment method, card name, date, time, description, notes, and who added it.
+### Filtering
 
-On top of that sits a filter bar: free-text search, a date range (this week, this month, last 30 days, or dates you pick), category, payment method, and sorting by date or amount. A running count and total always reflects what's currently on screen. Tapping a category on the Dashboard or in Reports jumps straight to those expenses.
+A filter bar sits above every expense list: text search, date range (this week, this month, last 30 days, or a custom range), category, payment method, and sorting by date or amount. The count and total above the list always describe what is currently visible. Tapping a category in the Dashboard or Reports opens the list already filtered to it.
 
 ### Budgets and recurring bills
 
-<img src="screenshots/budgets.png" width="260" align="right" alt="Budget screen with a progress bar against actual spending" />
+<img src="screenshots/budgets.png" width="250" align="right" alt="Budget screen with a progress bar against actual spending" />
 
-Set a monthly limit per category with a warning threshold, and track it as a progress bar against real spending.
+Budgets are a monthly limit per category plus a warning threshold, drawn as a progress bar against real spending.
 
-Recurring bills — weekly or monthly — turn themselves into real expenses when they fall due. Generation runs inside a Firestore transaction that re-checks the due date before claiming it, so a bill is logged exactly once no matter how many household members open the app at the same moment.
+Recurring bills repeat weekly or monthly and become ordinary expenses when they fall due. The app generates them inside a Firestore transaction that re-reads the due date before writing, so two people opening the app at the same time cannot both log the same bill.
 
 Reports break a month down by category and by member.
 
 <br clear="right" />
 
-### Share anything as an image
+### Sharing
 
-Any expense, filtered list, budget, recurring bill or monthly report renders to a PNG and goes out through the Android share sheet. You see a preview of exactly what will be sent before it goes, and exports are always light-themed so they stay readable for whoever receives them.
+Any expense, filtered list, budget, recurring bill or monthly report can be rendered to a PNG and sent through the Android share sheet. The card is shown as a preview first, and exports are always drawn in the light theme so they stay legible for whoever receives them.
 
 <p>
-  <img src="screenshots/share.png" width="260" alt="Share preview showing the image that will be sent" />
-  <img src="screenshots/shared-image.png" width="300" alt="An exported PNG listing five expenses with a total" />
+  <img src="screenshots/share.png" width="250" alt="Share preview showing the image that will be sent" />
+  <img src="screenshots/shared-image.png" width="290" alt="An exported PNG listing five expenses with a total" />
 </p>
 
-### Smaller things
+### Widget, shortcut and theme
 
-A home screen widget and a long-press app shortcut that jump straight to the Add Expense form, and a light / dark / follow-system theme setting.
+A home screen widget and a long press launcher shortcut both open the Add Expense form directly. The theme can follow the system or be pinned to light or dark.
 
-## Built with
+## Architecture
 
 | | |
 |---|---|
 | Language | Kotlin 2.2 |
 | UI | Jetpack Compose, Material 3 |
-| Auth & data | Firebase Auth (email/password), Cloud Firestore |
-| Architecture | MVVM — Repository → ViewModel → Composable |
-| Async | Coroutines and Flow; snapshot listeners exposed as `StateFlow` |
-| Charts | Hand-drawn on Compose `Canvas` — no charting library |
+| Auth and data | Firebase Auth (email/password), Cloud Firestore |
+| Pattern | MVVM: Repository → ViewModel → Composable |
+| Async | Coroutines and Flow. Snapshot listeners are wrapped in `callbackFlow` and exposed as `StateFlow` |
+| Charts | Drawn directly on a Compose `Canvas` |
 | Min / target SDK | 26 / 36 |
 
-Two deliberate omissions: there's no dependency injection framework — ViewModels are wired with hand-written factories — and navigation is an enum plus a `mutableStateListOf` back stack rather than the Navigation component. At this size both stay easier to follow than the machinery they'd replace.
+There is no dependency injection framework. ViewModels are built by hand-written factories. Navigation is a `Screen` enum plus a `mutableStateListOf` back stack rather than the Navigation component. Both would be worth revisiting if the app grew, but at nine screens the plain versions are shorter than the setup they would replace.
 
 ```
 app/src/main/java/com/grvig/financetracker/
 ├── data/            Plain data classes
-├── repository/      Firestore reads/writes, live queries as callbackFlow
+├── repository/      Firestore reads and writes, live queries as callbackFlow
 ├── viewmodel/       ViewModels and their factories
 ├── ui/theme/        Colour scheme, typography
 ├── *Screen.kt       One file per screen
-├── ExpenseFilters   Filtering/sorting model — pure Kotlin, unit tested
+├── ExpenseFilters   Filtering and sorting model, pure Kotlin, unit tested
 ├── ShareCard.kt     The layouts that get rendered to PNG
 └── MainActivity.kt  Navigation back stack, drawer, theme wiring
 ```
 
-## Building it yourself
+## Running it
 
-You'll need Android Studio — its bundled JDK is sufficient.
+The committed `google-services.json` points at my Firebase project, so a clone will not authenticate. To run your own:
 
-This app points at my Firebase project, so a clone won't authenticate against it. To run your own:
-
-1. Create a Firebase project and add an Android app with the applicationId `com.grvig.financetracker` (or change it in `app/build.gradle.kts`).
-2. Enable **Authentication → Email/Password** and create a **Cloud Firestore** database.
-3. Replace `app/google-services.json` with your own.
-4. Publish the rules in [`firestore.rules`](firestore.rules) — they scope every read and write to members of the household.
+1. Create a Firebase project and register an Android app using the applicationId `com.grvig.financetracker`, or change it in `app/build.gradle.kts`.
+2. Enable Authentication with the Email/Password provider, and create a Cloud Firestore database.
+3. Replace `app/google-services.json` with the one Firebase generates.
+4. Publish [`firestore.rules`](firestore.rules). Every read and write is scoped to members of the household.
 
 ```bash
 ./gradlew installDebug
 ```
 
-Filtering, sorting and label formatting are pure functions with unit tests:
+Filtering, sorting and label formatting are pure functions and have unit tests. Screens are checked by hand on an emulator.
 
 ```bash
 ./gradlew testDebugUnitTest
 ```
 
-Screens are verified by hand on an emulator.
+## Release builds
 
-### Release builds
-
-Signing reads from a `keystore.properties` at the repo root, gitignored along with the keystore itself:
+Signing reads a `keystore.properties` from the repository root. Both it and the keystore are gitignored.
 
 ```properties
 storeFile=keystore.jks
@@ -123,7 +107,7 @@ keyAlias=...
 keyPassword=...
 ```
 
-Without that file the signing config is skipped, so debug builds still work.
+If that file is absent the signing config is skipped, so debug builds still work on a fresh clone.
 
 ```bash
 ./gradlew assembleRelease
@@ -131,9 +115,9 @@ Without that file the signing config is skipped, so debug builds still work.
 
 ## Release history
 
-| Version | Highlights |
+| Version | Changes |
 |---|---|
-| **1.3** | Live sync, home screen widget, dark mode, new app icon, recurring duplicate fix |
-| **1.2** | Filter/sort system, PNG sharing, UI modernisation, card names |
-| **1.1** | Navigation drawer, green Material 3 theme, charts rebuilt, My Expenses |
-| **1.0** | Multi-user households on Firebase |
+| 1.3 | Live sync, home screen widget, dark mode, new launcher icon, recurring duplicate fix |
+| 1.2 | Filtering and sorting, PNG sharing, UI rework, card names |
+| 1.1 | Navigation drawer, Material 3 theme, rebuilt charts, My Expenses |
+| 1.0 | Multi-user households on Firebase |
