@@ -10,6 +10,27 @@ Requires Android 8.0 (API 26) or newer.
 
 ---
 
+## Screenshots
+
+<p>
+  <img src="screenshots/dashboard.png" width="270" alt="Dashboard showing monthly total, budget progress and a category breakdown" />
+  <img src="screenshots/expenses.png" width="270" alt="Expense list with the search and filter bar" />
+  <img src="screenshots/budgets.png" width="270" alt="Budget screen with a progress bar against actual spending" />
+</p>
+
+<p>
+  <img src="screenshots/share.png" width="270" alt="Share preview showing the image that will be sent" />
+  <img src="screenshots/dark-mode.png" width="270" alt="The dashboard in dark mode" />
+</p>
+
+Any list, expense, budget or report can be exported as an image and sent through the share sheet. Exports stay light-themed regardless of the sender's theme:
+
+<p>
+  <img src="screenshots/shared-image.png" width="320" alt="An exported PNG listing five expenses with a total" />
+</p>
+
+---
+
 ## What it does
 
 **Shared, live**
