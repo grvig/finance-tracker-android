@@ -1,5 +1,6 @@
 package com.grvig.financetracker.repository
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.grvig.financetracker.SessionManager
@@ -76,13 +77,17 @@ class RecurringExpenseRepository {
                 val claimed = db.runTransaction { transaction ->
 
                     val docRef = recurringRef.document(candidate.id)
-                    val snapshot = transaction.get(docRef)
 
-                    val currentDue = snapshot.getString("nextDueDate")
-                    val stillActive = snapshot.getBoolean("isActive") ?: false
-                    val frequency = snapshot.getString("frequency") ?: "Monthly"
+                    // Read the whole object rather than named fields: Kotlin's
+                    // `isActive` serializes as "active", and hand-written field
+                    // names drift from the model.
+                    val current = transaction
+                        .get(docRef)
+                        .toObject(RecurringExpense::class.java)
+                        ?: return@runTransaction false
 
-                    if (currentDue == null || !stillActive || currentDue > today) {
+                    // Someone else already claimed this period.
+                    if (!current.isActive || current.nextDueDate > today) {
                         return@runTransaction false
                     }
 
@@ -92,13 +97,13 @@ class RecurringExpenseRepository {
                         expenseRef,
                         Expense(
                             id = expenseRef.id,
-                            amount = snapshot.getDouble("amount") ?: 0.0,
-                            category = snapshot.getString("category") ?: "",
-                            paymentMethod = snapshot.getString("paymentMethod") ?: "",
-                            cardName = snapshot.getString("cardName"),
-                            description = snapshot.getString("title") ?: "",
-                            notes = snapshot.getString("notes") ?: "",
-                            date = currentDue,
+                            amount = current.amount,
+                            category = current.category,
+                            paymentMethod = current.paymentMethod,
+                            cardName = current.cardName,
+                            description = current.title,
+                            notes = current.notes,
+                            date = current.nextDueDate,
                             time = LocalTime.now().toString(),
                             isRecurring = true,
                             householdId = householdId,
@@ -106,10 +111,14 @@ class RecurringExpenseRepository {
                         )
                     )
 
-                    transaction.update(
+                    transaction.set(
                         docRef,
-                        "nextDueDate",
-                        nextDueDateAfter(currentDue, frequency)
+                        current.copy(
+                            nextDueDate = nextDueDateAfter(
+                                current.nextDueDate,
+                                current.frequency
+                            )
+                        )
                     )
 
                     true
@@ -123,6 +132,7 @@ class RecurringExpenseRepository {
             generated
 
         } catch (e: Exception) {
+            Log.e("FinanceTracker", "Recurring generation failed", e)
             0
         }
     }

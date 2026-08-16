@@ -38,22 +38,6 @@ import com.grvig.financetracker.data.RecurringExpense
 import com.grvig.financetracker.viewmodel.RecurringExpenseViewModel
 import com.grvig.financetracker.viewmodel.HouseholdViewModel
 
-private fun nextDueDateAfter(
-    currentDueDate: String,
-    frequency: String
-): String {
-
-    val dueDate = LocalDate.parse(currentDueDate)
-
-    val advancedDate = if (frequency == "Weekly") {
-        dueDate.plusWeeks(1)
-    } else {
-        dueDate.plusMonths(1)
-    }
-
-    return advancedDate.toString()
-}
-
 @Composable
 fun DashboardScreen(
 expenseViewModel: ExpenseViewModel,
@@ -87,38 +71,9 @@ onOpenDrawer: () -> Unit
     LaunchedEffect(Unit) {
         scope.launch {
 
-            val dueRecurringExpenses = recurringExpenseViewModel
-                .getAllRecurringExpenses()
-                .filter {
-                    it.isActive &&
-                        it.nextDueDate <= LocalDate.now().toString()
-                }
-
-            dueRecurringExpenses.forEach { recurringExpense ->
-
-                expenseViewModel.insertExpense(
-                    Expense(
-                        amount = recurringExpense.amount,
-                        category = recurringExpense.category,
-                        paymentMethod = recurringExpense.paymentMethod,
-                        cardName = recurringExpense.cardName,
-                        description = recurringExpense.title,
-                        notes = recurringExpense.notes,
-                        date = recurringExpense.nextDueDate,
-                        time = LocalTime.now().toString(),
-                        isRecurring = true
-                    )
-                )
-
-                recurringExpenseViewModel.updateRecurringExpense(
-                    recurringExpense.copy(
-                        nextDueDate = nextDueDateAfter(
-                            recurringExpense.nextDueDate,
-                            recurringExpense.frequency
-                        )
-                    )
-                )
-            }
+            recurringExpenseViewModel.generateDueExpenses(
+                LocalDate.now().toString()
+            )
 
             memberCount = householdViewModel.getHousehold(
                 SessionManager.currentHouseholdId
