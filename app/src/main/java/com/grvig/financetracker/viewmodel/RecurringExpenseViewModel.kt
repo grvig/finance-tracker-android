@@ -52,6 +52,14 @@ class RecurringExpenseViewModel(
         }
     }
 
+    /** @return how many expenses were created. */
+    suspend fun generateDueExpenses(today: String): Int {
+        return repository.generateDueExpenses(
+            SessionManager.currentHouseholdId,
+            today
+        )
+    }
+
     suspend fun getAllRecurringExpenses():
             List<RecurringExpense> {
         return repository.getAllRecurringExpenses()
