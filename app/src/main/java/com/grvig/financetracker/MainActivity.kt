@@ -278,6 +278,17 @@ class MainActivity : ComponentActivity() {
                                 SessionManager.currentHouseholdId =
                                     profile?.householdId ?: ""
 
+                                // Cached so the quick add card can draw its
+                                // category chips without a Firestore round trip.
+                                if (SessionManager.currentHouseholdId.isNotBlank()) {
+                                    AppPreferences.saveCategories(
+                                        this@MainActivity,
+                                        householdViewModel.getCategories(
+                                            SessionManager.currentHouseholdId
+                                        )
+                                    )
+                                }
+
                                 resetTo(
                                     if (SessionManager.currentHouseholdId.isBlank())
                                         Screen.HOUSEHOLD_SETUP
