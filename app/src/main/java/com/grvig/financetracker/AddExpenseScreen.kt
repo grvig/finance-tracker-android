@@ -27,6 +27,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.viewmodel.ExpenseViewModel
@@ -95,6 +96,8 @@ fun AddExpenseScreen(
     val snackbarHostState = remember {
         SnackbarHostState()
     }
+
+    val context = LocalContext.current
 
     val scope = rememberCoroutineScope()
 
@@ -335,6 +338,9 @@ fun AddExpenseScreen(
                 expenseViewModel.insertExpense(
                     expense
                 )
+
+                // Quick add has no payment field and reuses this.
+                AppPreferences.saveLastPaymentMethod(context, paymentMethod)
 
                 scope.launch {
 
