@@ -19,7 +19,12 @@ class QuickAddActivity : ComponentActivity() {
 
         setContent {
             FinanceTrackerTheme(themeMode = ThemePreference.load(this)) {
-                QuickAddScreen(onDismiss = { finish() })
+                QuickAddScreen(
+                    categories = AppPreferences.loadCategories(this),
+                    onSave = { _, _, _ -> finish() },
+                    onMoreOptions = { _, _, _ -> finish() },
+                    onDismiss = { finish() }
+                )
             }
         }
     }
