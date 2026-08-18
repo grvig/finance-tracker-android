@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.google.firebase.auth.FirebaseAuth
 import com.grvig.financetracker.data.Expense
 import com.grvig.financetracker.repository.ExpenseRepository
 import com.grvig.financetracker.ui.theme.FinanceTrackerTheme
@@ -25,10 +26,29 @@ class QuickAddActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val categories = AppPreferences.loadCategories(this)
+
+        // Quick add only works once the app has been opened at least once:
+        // it needs a signed in user, a household, and cached categories. Any
+        // of those missing and we hand off to the app, which fills them in.
+        val ready = FirebaseAuth.getInstance().currentUser != null &&
+            SessionManager.currentHouseholdId.isNotBlank() &&
+            categories.isNotEmpty()
+
+        if (!ready) {
+            startActivity(
+                Intent(this, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            )
+            finish()
+            return
+        }
+
         setContent {
             FinanceTrackerTheme(themeMode = ThemePreference.load(this)) {
                 QuickAddScreen(
-                    categories = AppPreferences.loadCategories(this),
+                    categories = categories,
                     onSave = { amount, category, description ->
                         save(amount, category, description)
                     },
