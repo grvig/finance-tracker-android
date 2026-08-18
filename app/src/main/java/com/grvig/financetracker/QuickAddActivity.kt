@@ -52,7 +52,9 @@ class QuickAddActivity : ComponentActivity() {
                     onSave = { amount, category, description ->
                         save(amount, category, description)
                     },
-                    onMoreOptions = { _, _, _ -> finish() },
+                    onMoreOptions = { amount, category, description ->
+                        openFullForm(amount, category, description)
+                    },
                     onDismiss = { finish() }
                 )
             }
@@ -83,6 +85,24 @@ class QuickAddActivity : ComponentActivity() {
         finish()
     }
 
+    /** Hands the part-typed expense to the full Add Expense screen. */
+    private fun openFullForm(
+        amount: String,
+        category: String,
+        description: String
+    ) {
+        startActivity(
+            Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra(AddExpenseWidget.EXTRA_OPEN_ADD_EXPENSE, true)
+                putExtra(EXTRA_AMOUNT, amount)
+                putExtra(EXTRA_CATEGORY, category)
+                putExtra(EXTRA_DESCRIPTION, description)
+            }
+        )
+        finish()
+    }
+
     override fun finish() {
         super.finish()
         // No slide animation; the card should feel like part of the launcher.
@@ -90,6 +110,11 @@ class QuickAddActivity : ComponentActivity() {
     }
 
     companion object {
+
+        const val EXTRA_AMOUNT = "quick_add_amount"
+        const val EXTRA_CATEGORY = "quick_add_category"
+        const val EXTRA_DESCRIPTION = "quick_add_description"
+
         fun intent(context: Context): Intent {
             return Intent(context, QuickAddActivity::class.java).apply {
                 addFlags(

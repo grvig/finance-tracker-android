@@ -43,6 +43,11 @@ class MainActivity : ComponentActivity() {
      */
     private var pendingAddExpense by mutableStateOf(false)
 
+    /** Values typed into the quick add card before "More options" was tapped. */
+    private var pendingAmount by mutableStateOf("")
+    private var pendingCategory by mutableStateOf("")
+    private var pendingDescription by mutableStateOf("")
+
     private lateinit var expenseViewModel: ExpenseViewModel
     private lateinit var budgetViewModel: BudgetViewModel
     private lateinit var recurringExpenseViewModel: RecurringExpenseViewModel
@@ -52,18 +57,24 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        if (intent.getBooleanExtra(AddExpenseWidget.EXTRA_OPEN_ADD_EXPENSE, false)) {
-            pendingAddExpense = true
+        readAddExpenseExtras(intent)
+    }
+
+    private fun readAddExpenseExtras(intent: Intent) {
+        if (!intent.getBooleanExtra(AddExpenseWidget.EXTRA_OPEN_ADD_EXPENSE, false)) {
+            return
         }
+        pendingAddExpense = true
+        pendingAmount = intent.getStringExtra(QuickAddActivity.EXTRA_AMOUNT) ?: ""
+        pendingCategory = intent.getStringExtra(QuickAddActivity.EXTRA_CATEGORY) ?: ""
+        pendingDescription =
+            intent.getStringExtra(QuickAddActivity.EXTRA_DESCRIPTION) ?: ""
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        pendingAddExpense = intent.getBooleanExtra(
-            AddExpenseWidget.EXTRA_OPEN_ADD_EXPENSE,
-            false
-        )
+        readAddExpenseExtras(intent)
 
         val repository = ExpenseRepository()
 
@@ -392,6 +403,19 @@ class MainActivity : ComponentActivity() {
                     }
 
                     Screen.ADD_EXPENSE -> {
+
+                        // Read before clearing so the first composition seeds
+                        // the form and a later visit starts empty.
+                        val seedAmount = pendingAmount
+                        val seedCategory = pendingCategory
+                        val seedDescription = pendingDescription
+
+                        LaunchedEffect(Unit) {
+                            pendingAmount = ""
+                            pendingCategory = ""
+                            pendingDescription = ""
+                        }
+
                         AddExpenseScreen(
                             expenseViewModel = expenseViewModel,
                             householdViewModel = householdViewModel,
@@ -400,7 +424,10 @@ class MainActivity : ComponentActivity() {
                             },
                             onBack = {
                                 goBack()
-                            }
+                            },
+                            initialAmount = seedAmount,
+                            initialCategory = seedCategory,
+                            initialDescription = seedDescription
                         )
                     }
 

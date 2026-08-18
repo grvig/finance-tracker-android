@@ -44,13 +44,16 @@ fun AddExpenseScreen(
     expenseViewModel: ExpenseViewModel,
     householdViewModel: HouseholdViewModel,
     onViewExpensesClick: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    initialAmount: String = "",
+    initialCategory: String = "",
+    initialDescription: String = ""
 ) {
 
-    var amount by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf(initialAmount) }
 
     var category by remember {
-        mutableStateOf("")
+        mutableStateOf(initialCategory)
     }
 
     var paymentMethod by remember {
@@ -59,7 +62,7 @@ fun AddExpenseScreen(
 
     var cardName by remember { mutableStateOf("") }
 
-    var description by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf(initialDescription) }
     var notes by remember { mutableStateOf("") }
 
     var categoryExpanded by remember {
