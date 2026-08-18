@@ -9,13 +9,9 @@
         android:shortcutShortLabel="@string/shortcut_add_expense_short">
 
         <intent
-            android:action="android.intent.action.MAIN"
-            android:targetClass="com.grvig.financetracker.MainActivity"
-            android:targetPackage="com.grvig.financetracker">
-            <extra
-                android:name="open_add_expense"
-                android:value="true" />
-        </intent>
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.grvig.financetracker.QuickAddActivity"
+            android:targetPackage="com.grvig.financetracker" />
     </shortcut>
 
 </shortcuts>

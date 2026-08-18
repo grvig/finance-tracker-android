@@ -4,10 +4,9 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
-import android.content.Intent
 import android.widget.RemoteViews
 
-/** Home screen shortcut that opens the app straight on the Add Expense form. */
+/** Home screen button that opens the floating quick add card. */
 class AddExpenseWidget : AppWidgetProvider() {
 
     override fun onUpdate(
@@ -18,12 +17,7 @@ class AddExpenseWidget : AppWidgetProvider() {
 
         appWidgetIds.forEach { widgetId ->
 
-            val intent = Intent(context, MainActivity::class.java).apply {
-                action = Intent.ACTION_MAIN
-                putExtra(EXTRA_OPEN_ADD_EXPENSE, true)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
+            val intent = QuickAddActivity.intent(context)
 
             val pendingIntent = PendingIntent.getActivity(
                 context,
