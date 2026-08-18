@@ -30,6 +30,15 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
+        <activity
+            android:name=".QuickAddActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:taskAffinity=".QuickAdd"
+            android:theme="@style/Theme.FinanceTracker.QuickAdd"
+            android:windowSoftInputMode="adjustResize|stateVisible" />
+
         <receiver
             android:name=".AddExpenseWidget"
             android:exported="false">
