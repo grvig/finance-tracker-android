@@ -15,5 +15,6 @@ class FinanceTrackerApp : Application() {
     override fun onCreate() {
         super.onCreate()
         SessionManager.restore(this)
+        NotificationPoster.ensureChannel(this)
     }
 }

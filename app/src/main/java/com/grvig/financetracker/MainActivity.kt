@@ -1,9 +1,13 @@
 package com.grvig.financetracker
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModelProvider
@@ -48,6 +52,9 @@ class MainActivity : ComponentActivity() {
     private var pendingCategory by mutableStateOf("")
     private var pendingDescription by mutableStateOf("")
 
+    /** Set when a notification is tapped, to open the expense list. */
+    private var pendingOpenExpenseList by mutableStateOf(false)
+
     private lateinit var expenseViewModel: ExpenseViewModel
     private lateinit var budgetViewModel: BudgetViewModel
     private lateinit var recurringExpenseViewModel: RecurringExpenseViewModel
@@ -58,6 +65,13 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         readAddExpenseExtras(intent)
+        readNotificationExtras(intent)
+    }
+
+    private fun readNotificationExtras(intent: Intent) {
+        if (intent.getBooleanExtra(NotificationPoster.EXTRA_OPEN_EXPENSE_LIST, false)) {
+            pendingOpenExpenseList = true
+        }
     }
 
     private fun readAddExpenseExtras(intent: Intent) {
@@ -75,6 +89,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         readAddExpenseExtras(intent)
+        readNotificationExtras(intent)
 
         val repository = ExpenseRepository()
 
@@ -136,6 +151,18 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(ThemePreference.load(this))
             }
 
+            val notificationPermissionLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { /* Prefs already saved; nothing to do on the result. */ }
+
+            fun requestNotificationPermission() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    notificationPermissionLauncher.launch(
+                        Manifest.permission.POST_NOTIFICATIONS
+                    )
+                }
+            }
+
             FinanceTrackerTheme(themeMode = themeMode) {
 
                 val backStack = remember {
@@ -194,6 +221,23 @@ class MainActivity : ComponentActivity() {
                         pendingAddExpense = false
                         if (currentScreen != Screen.ADD_EXPENSE) {
                             navigateTo(Screen.ADD_EXPENSE)
+                        }
+                    }
+                }
+
+                LaunchedEffect(pendingOpenExpenseList, currentScreen) {
+
+                    val ready = currentScreen != Screen.LOADING &&
+                        currentScreen != Screen.LOGIN &&
+                        currentScreen != Screen.SIGNUP &&
+                        currentScreen != Screen.HOUSEHOLD_SETUP &&
+                        SessionManager.currentHouseholdId.isNotBlank()
+
+                    if (pendingOpenExpenseList && ready) {
+                        pendingOpenExpenseList = false
+                        if (currentScreen != Screen.EXPENSE_LIST) {
+                            expenseListCategory = FILTER_ALL
+                            navigateTo(Screen.EXPENSE_LIST)
                         }
                     }
                 }
@@ -266,6 +310,7 @@ class MainActivity : ComponentActivity() {
                                     scope.launch { drawerState.close() }
                                     authViewModel.signOut()
                                     SessionManager.currentHouseholdId = ""
+                                    ExpenseNotificationScheduler.refresh(this@MainActivity)
                                     resetTo(Screen.LOGIN)
                                 }
                             )
@@ -299,6 +344,10 @@ class MainActivity : ComponentActivity() {
                                         )
                                     )
                                 }
+
+                                ExpenseNotificationScheduler.refresh(
+                                    this@MainActivity
+                                )
 
                                 resetTo(
                                     if (SessionManager.currentHouseholdId.isBlank())
@@ -396,6 +445,7 @@ class MainActivity : ComponentActivity() {
                             onSignOutClick = {
                                 authViewModel.signOut()
                                 SessionManager.currentHouseholdId = ""
+                                ExpenseNotificationScheduler.refresh(this@MainActivity)
                                 resetTo(Screen.LOGIN)
                             },
                             onOpenDrawer = { openDrawer() }
@@ -570,7 +620,7 @@ class MainActivity : ComponentActivity() {
                             onBack = {
                                 goBack()
                             },
-                            onMasterEnabled = { }
+                            onMasterEnabled = { requestNotificationPermission() }
                         )
                     }
                 }
