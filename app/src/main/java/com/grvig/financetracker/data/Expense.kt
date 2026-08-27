@@ -12,5 +12,9 @@ data class Expense(
     val time: String = "",
     val isRecurring: Boolean = false,
     val householdId: String = "",
-    val addedBy: String = ""
+    val addedBy: String = "",
+    // When the row was created, epoch millis. Distinct from `date`, which the
+    // user can backdate. Notifications key off this so a backdated expense
+    // still alerts when it is entered.
+    val createdAt: Long = 0L
 )

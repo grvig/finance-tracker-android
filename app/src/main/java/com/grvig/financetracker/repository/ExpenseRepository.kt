@@ -28,7 +28,8 @@ class ExpenseRepository {
                 expense.copy(
                     id = docRef.id,
                     householdId = SessionManager.currentHouseholdId,
-                    addedBy = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                    addedBy = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                    createdAt = System.currentTimeMillis()
                 )
             ).await()
         } catch (e: Exception) {
