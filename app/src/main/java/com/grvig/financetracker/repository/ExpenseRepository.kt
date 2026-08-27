@@ -59,6 +59,26 @@ class ExpenseRepository {
     }
 
     /**
+     * One-shot fetch for background work, which cannot hold a Flow. Takes the
+     * household explicitly rather than reading the session singleton so it is
+     * safe to call from a Worker.
+     */
+    suspend fun getExpensesOnce(householdId: String): List<Expense> {
+        if (householdId.isBlank()) return emptyList()
+        return try {
+            db.collection("households")
+                .document(householdId)
+                .collection("expenses")
+                .get()
+                .await()
+                .documents
+                .mapNotNull { it.toObject(Expense::class.java) }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+        /**
      * Emits the household's expenses and then again on every remote change, so
      * one member's edit shows up for the others without a manual refresh.
      */
