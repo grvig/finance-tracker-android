@@ -31,6 +31,7 @@ fun HouseholdInfoScreen(
     onThemeModeChange: (ThemeMode) -> Unit,
     onBack: () -> Unit,
     onManageCategoriesClick: () -> Unit,
+    onNotificationsClick: () -> Unit,
     onLeaveHousehold: () -> Unit
 ) {
 
@@ -117,6 +118,13 @@ fun HouseholdInfoScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Manage Categories")
+            }
+
+            Button(
+                onClick = onNotificationsClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Notifications")
             }
 
             Button(

@@ -543,6 +543,9 @@ class MainActivity : ComponentActivity() {
                             onManageCategoriesClick = {
                                 navigateTo(Screen.MANAGE_CATEGORIES)
                             },
+                            onNotificationsClick = {
+                                navigateTo(Screen.NOTIFICATION_SETTINGS)
+                            },
                             onLeaveHousehold = {
                                 resetTo(Screen.HOUSEHOLD_SETUP)
                             }
@@ -556,6 +559,18 @@ class MainActivity : ComponentActivity() {
                             onBack = {
                                 goBack()
                             }
+                        )
+                    }
+
+                    Screen.NOTIFICATION_SETTINGS -> {
+
+                        NotificationSettingsScreen(
+                            householdViewModel = householdViewModel,
+                            currentUserId = authViewModel.currentUser?.uid ?: "",
+                            onBack = {
+                                goBack()
+                            },
+                            onMasterEnabled = { }
                         )
                     }
                 }
