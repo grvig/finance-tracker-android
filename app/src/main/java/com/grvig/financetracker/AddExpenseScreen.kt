@@ -342,8 +342,9 @@ fun AddExpenseScreen(
                     expense
                 )
 
-                // Quick add has no payment field and reuses this.
+                // Seeds the quick add card next time it opens.
                 AppPreferences.saveLastPaymentMethod(context, paymentMethod)
+                AppPreferences.saveLastCategory(context, category)
 
                 scope.launch {
 

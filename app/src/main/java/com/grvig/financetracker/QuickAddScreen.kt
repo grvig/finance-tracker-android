@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun QuickAddScreen(
     categories: List<String>,
+    initialCategory: String,
     paymentMethods: List<String>,
     initialPaymentMethod: String,
     onSave: (
@@ -59,7 +60,11 @@ fun QuickAddScreen(
     var description by remember { mutableStateOf("") }
 
     var category by remember {
-        mutableStateOf(categories.firstOrNull() ?: "")
+        mutableStateOf(
+            initialCategory.takeIf { it in categories }
+                ?: categories.firstOrNull()
+                ?: ""
+        )
     }
 
     var paymentMethod by remember {

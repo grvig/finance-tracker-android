@@ -13,6 +13,7 @@ object AppPreferences {
     private const val KEY_HOUSEHOLD_ID = "household_id"
     private const val KEY_CATEGORIES = "cached_categories"
     private const val KEY_LAST_PAYMENT_METHOD = "last_payment_method"
+    private const val KEY_LAST_CATEGORY = "last_category"
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -52,5 +53,17 @@ object AppPreferences {
 
     fun saveLastPaymentMethod(context: Context, method: String) {
         prefs(context).edit().putString(KEY_LAST_PAYMENT_METHOD, method).apply()
+    }
+
+    /**
+     * Household spending clusters, so the category used last is a better first
+     * guess than whatever happens to sort first.
+     */
+    fun loadLastCategory(context: Context): String {
+        return prefs(context).getString(KEY_LAST_CATEGORY, null).orEmpty()
+    }
+
+    fun saveLastCategory(context: Context, category: String) {
+        prefs(context).edit().putString(KEY_LAST_CATEGORY, category).apply()
     }
 }

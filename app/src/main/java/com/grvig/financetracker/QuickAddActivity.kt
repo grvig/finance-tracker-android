@@ -49,6 +49,7 @@ class QuickAddActivity : ComponentActivity() {
             FinanceTrackerTheme(themeMode = ThemePreference.load(this)) {
                 QuickAddScreen(
                     categories = categories,
+                    initialCategory = AppPreferences.loadLastCategory(this),
                     paymentMethods = PAYMENT_METHODS,
                     initialPaymentMethod = AppPreferences.loadLastPaymentMethod(this),
                     onSave = { amount, category, paymentMethod, description ->
@@ -85,6 +86,7 @@ class QuickAddActivity : ComponentActivity() {
         )
 
         AppPreferences.saveLastPaymentMethod(this, paymentMethod)
+        AppPreferences.saveLastCategory(this, category)
 
         AppScope.io.launch {
             repository.insertExpense(expense)
