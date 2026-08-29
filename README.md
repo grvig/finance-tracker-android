@@ -47,9 +47,21 @@ Any expense, filtered list, budget, recurring bill or monthly report can be rend
   <img src="screenshots/shared-image.png" width="290" alt="An exported PNG listing five expenses with a total" />
 </p>
 
-### Widget, shortcut and theme
+### Adding an expense without opening the app
 
-A home screen widget and a long press launcher shortcut both open the Add Expense form directly. The theme can follow the system or be pinned to light or dark.
+A home screen widget and a long press launcher shortcut both lead to a small card that floats over the launcher: type an amount, pick a category and a payment method, save. It writes on an application scope and closes immediately, so the card is gone before Firestore has finished. Both the category and the payment method start on whatever was used last, and "More options" hands the half typed expense to the full form.
+
+Android widgets cannot hold a text field, which is why this is a floating activity rather than a keypad on the home screen.
+
+### Notifications
+
+Each person chooses, on their own phone, which household members they want to hear from. Adding an expense then notifies whoever follows you. Several expenses arriving at once are bundled into one summary rather than a stack of alerts, and tapping through opens the expense list.
+
+There is no server. A WorkManager job polls for rows newer than the last one it saw, so a notification can take a few minutes to arrive. That keeps the project on Firebase's free tier, which no longer includes Cloud Functions.
+
+### Theme
+
+The theme can follow the system or be pinned to light or dark.
 
 ## Architecture
 
@@ -117,6 +129,7 @@ If that file is absent the signing config is skipped, so debug builds still work
 
 | Version | Changes |
 |---|---|
+| 1.4 | Quick add card, per member expense notifications |
 | 1.3 | Live sync, home screen widget, dark mode, new launcher icon, recurring duplicate fix |
 | 1.2 | Filtering and sorting, PNG sharing, UI rework, card names |
 | 1.1 | Navigation drawer, Material 3 theme, rebuilt charts, My Expenses |
