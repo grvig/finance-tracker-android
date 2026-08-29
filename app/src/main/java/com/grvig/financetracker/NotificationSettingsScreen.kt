@@ -1,5 +1,9 @@
 package com.grvig.financetracker
 
+import android.content.Intent
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,8 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
 import com.grvig.financetracker.viewmodel.HouseholdViewModel
 
 @Composable
@@ -43,6 +51,21 @@ fun NotificationSettingsScreen(
         mutableStateOf(
             NotificationPreferences.followedUsers(context, currentUserId)
         )
+    }
+
+    // The in app switches mean nothing if Android itself is blocking us, and
+    // the system dialog only ever asks once.
+    var systemAllowed by remember {
+        mutableStateOf(
+            NotificationManagerCompat.from(context).areNotificationsEnabled()
+        )
+    }
+
+    val systemSettings = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        systemAllowed = NotificationManagerCompat.from(context)
+            .areNotificationsEnabled()
     }
 
     var members by remember {
@@ -71,6 +94,45 @@ fun NotificationSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
 
+            if (!systemAllowed) {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Notifications are turned off for this app",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                        Text(
+                            text = "Nothing below will reach you until you allow " +
+                                "them in Android settings.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                        TextButton(
+                            onClick = {
+                                systemSettings.launch(
+                                    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                        .putExtra(
+                                            Settings.EXTRA_APP_PACKAGE,
+                                            context.packageName
+                                        )
+                                )
+                            }
+                        ) {
+                            Text("Open settings")
+                        }
+                    }
+                }
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -97,6 +159,8 @@ fun NotificationSettingsScreen(
                             onMasterEnabled()
                         }
                         ExpenseNotificationScheduler.refresh(context)
+                        systemAllowed = NotificationManagerCompat.from(context)
+                            .areNotificationsEnabled()
                     }
                 )
             }
