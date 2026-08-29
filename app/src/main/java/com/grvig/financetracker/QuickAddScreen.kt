@@ -43,7 +43,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun QuickAddScreen(
     categories: List<String>,
-    onSave: (amount: Double, category: String, description: String) -> Unit,
+    paymentMethods: List<String>,
+    initialPaymentMethod: String,
+    onSave: (
+        amount: Double,
+        category: String,
+        paymentMethod: String,
+        description: String
+    ) -> Unit,
     onMoreOptions: (amount: String, category: String, description: String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -53,6 +60,10 @@ fun QuickAddScreen(
 
     var category by remember {
         mutableStateOf(categories.firstOrNull() ?: "")
+    }
+
+    var paymentMethod by remember {
+        mutableStateOf(initialPaymentMethod)
     }
 
     val amountFocus = remember { FocusRequester() }
@@ -136,6 +147,23 @@ fun QuickAddScreen(
                     }
                 }
 
+                if (paymentMethods.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        paymentMethods.forEach { method ->
+                            FilterChip(
+                                selected = paymentMethod == method,
+                                onClick = { paymentMethod = method },
+                                label = { Text(method) }
+                            )
+                        }
+                    }
+                }
+
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
@@ -162,7 +190,12 @@ fun QuickAddScreen(
                     Button(
                         enabled = canSave,
                         onClick = {
-                            onSave(parsedAmount ?: 0.0, category, description.trim())
+                            onSave(
+                                parsedAmount ?: 0.0,
+                                category,
+                                paymentMethod,
+                                description.trim()
+                            )
                         }
                     ) {
                         Text("Save")

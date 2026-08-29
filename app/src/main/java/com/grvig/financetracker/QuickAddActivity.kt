@@ -49,8 +49,10 @@ class QuickAddActivity : ComponentActivity() {
             FinanceTrackerTheme(themeMode = ThemePreference.load(this)) {
                 QuickAddScreen(
                     categories = categories,
-                    onSave = { amount, category, description ->
-                        save(amount, category, description)
+                    paymentMethods = PAYMENT_METHODS,
+                    initialPaymentMethod = AppPreferences.loadLastPaymentMethod(this),
+                    onSave = { amount, category, paymentMethod, description ->
+                        save(amount, category, paymentMethod, description)
                     },
                     onMoreOptions = { amount, category, description ->
                         openFullForm(amount, category, description)
@@ -66,16 +68,23 @@ class QuickAddActivity : ComponentActivity() {
      * on an application scope so closing this activity cannot cancel it, and
      * Firestore queues it locally if the device is offline.
      */
-    private fun save(amount: Double, category: String, description: String) {
+    private fun save(
+        amount: Double,
+        category: String,
+        paymentMethod: String,
+        description: String
+    ) {
 
         val expense = Expense(
             amount = amount,
             category = category,
-            paymentMethod = AppPreferences.loadLastPaymentMethod(this),
+            paymentMethod = paymentMethod,
             description = description,
             date = LocalDate.now().toString(),
             time = LocalTime.now().toString()
         )
+
+        AppPreferences.saveLastPaymentMethod(this, paymentMethod)
 
         AppScope.io.launch {
             repository.insertExpense(expense)
