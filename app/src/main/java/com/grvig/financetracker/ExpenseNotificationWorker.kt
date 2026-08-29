@@ -34,14 +34,16 @@ class ExpenseNotificationWorker(
 
         return try {
 
-            val expenses = ExpenseRepository().getExpensesOnce(householdId)
+            val marker = NotificationPreferences.lastSeenCreatedAt(applicationContext)
+
+            val expenses = ExpenseRepository()
+                .getExpensesCreatedAfter(householdId, marker)
 
             val selection = NotificationSelector.select(
                 expenses = expenses,
                 followedUsers = followed,
                 currentUserId = uid,
-                lastSeenCreatedAt = NotificationPreferences
-                    .lastSeenCreatedAt(applicationContext)
+                lastSeenCreatedAt = marker
             )
 
             if (selection.toNotify.isNotEmpty()) {
