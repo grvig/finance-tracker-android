@@ -57,15 +57,13 @@ object NotificationPoster {
         expenses.forEach { expense ->
 
             val who = memberEmails[expense.addedBy]
-                ?.substringBefore("@")
-                ?: "A household member"
-
-            val what = expense.description.ifBlank { expense.category }
 
             val notification = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_notify)
-                .setContentTitle("$who added ${formatMoneyFull(expense.amount)}")
-                .setContentText("$what · ${expense.category}")
+                .setContentTitle(
+                    NotificationText.title(who, formatMoneyFull(expense.amount))
+                )
+                .setContentText(NotificationText.body(expense))
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
