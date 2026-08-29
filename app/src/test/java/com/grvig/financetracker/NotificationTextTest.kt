@@ -47,4 +47,14 @@ class NotificationTextTest {
     fun `body falls back to the description when there is no category`() {
         assertEquals("Lunch", NotificationText.body(expense("Lunch", "")))
     }
+
+    @Test
+    fun `summary title is singular for one expense`() {
+        assertEquals("1 new expense", NotificationText.summaryTitle(1))
+    }
+
+    @Test
+    fun `summary title is plural for several expenses`() {
+        assertEquals("4 new expenses", NotificationText.summaryTitle(4))
+    }
 }

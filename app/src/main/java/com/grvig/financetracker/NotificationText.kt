@@ -24,6 +24,11 @@ object NotificationText {
      * The category alone when there is no description. Repeating it either side
      * of the separator read as "Food · Food" on the device.
      */
+    /** Title of the bundle shown when several expenses land in one poll. */
+    fun summaryTitle(count: Int): String {
+        return if (count == 1) "1 new expense" else "$count new expenses"
+    }
+
     fun body(expense: Expense): String {
         val description = expense.description.trim()
         val category = expense.category.trim()

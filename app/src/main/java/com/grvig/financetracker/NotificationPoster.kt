@@ -14,6 +14,8 @@ import com.grvig.financetracker.data.Expense
 object NotificationPoster {
 
     const val CHANNEL_ID = "household_expenses"
+    private const val GROUP_KEY = "com.grvig.financetracker.EXPENSES"
+    private const val SUMMARY_ID = 1
     const val EXTRA_OPEN_EXPENSE_LIST = "open_expense_list"
 
     fun ensureChannel(context: Context) {
@@ -65,6 +67,7 @@ object NotificationPoster {
                 )
                 .setContentText(NotificationText.body(expense))
                 .setContentIntent(contentIntent)
+                .setGroup(GROUP_KEY)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .build()
@@ -75,6 +78,50 @@ object NotificationPoster {
             } catch (e: SecurityException) {
                 // Permission revoked between the check above and here.
             }
+        }
+
+        if (expenses.size > 1) {
+            postSummary(context, manager, expenses, memberEmails, contentIntent)
+        }
+    }
+
+    /**
+     * Without a summary the launcher shows a stack of separate alerts. One
+     * bundle that expands into the individual rows is far easier to dismiss.
+     */
+    private fun postSummary(
+        context: Context,
+        manager: NotificationManagerCompat,
+        expenses: List<Expense>,
+        memberEmails: Map<String, String>,
+        contentIntent: PendingIntent
+    ) {
+
+        val style = NotificationCompat.InboxStyle()
+
+        expenses.forEach { expense ->
+            style.addLine(
+                NotificationText.title(
+                    memberEmails[expense.addedBy],
+                    formatMoneyFull(expense.amount)
+                )
+            )
+        }
+
+        val summary = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_stat_notify)
+            .setContentTitle(NotificationText.summaryTitle(expenses.size))
+            .setStyle(style)
+            .setGroup(GROUP_KEY)
+            .setGroupSummary(true)
+            .setContentIntent(contentIntent)
+            .setAutoCancel(true)
+            .build()
+
+        try {
+            manager.notify(SUMMARY_ID, summary)
+        } catch (e: SecurityException) {
+            // Permission revoked between the check above and here.
         }
     }
 }
