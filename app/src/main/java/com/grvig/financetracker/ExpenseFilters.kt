@@ -63,8 +63,10 @@ fun ExpenseFilters.dateLabel(): String {
     return when {
         dateRange == DateRange.ALL_TIME -> "Any date"
 
-        dateRange == DateRange.CUSTOM && start != null && end != null ->
-            "${formatExpenseDate(start.toString())} - ${formatExpenseDate(end.toString())}"
+        dateRange == DateRange.CUSTOM && start != null && end != null -> {
+            val (from, to) = if (start.isAfter(end)) end to start else start to end
+            "${formatExpenseDate(from.toString())} - ${formatExpenseDate(to.toString())}"
+        }
 
         else -> dateRange.label
     }
