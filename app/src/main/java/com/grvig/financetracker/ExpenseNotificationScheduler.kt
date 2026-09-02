@@ -66,6 +66,7 @@ object ExpenseNotificationScheduler {
     fun markCaughtUp(context: Context) {
         NotificationPreferences.setLastSeenCreatedAt(
             context,
+            FirebaseAuth.getInstance().currentUser?.uid.orEmpty(),
             System.currentTimeMillis()
         )
     }

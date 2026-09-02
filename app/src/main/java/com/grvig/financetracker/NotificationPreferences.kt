@@ -17,7 +17,8 @@ object NotificationPreferences {
     private const val PREFS_NAME = "finance_tracker_notifications"
     private const val KEY_ENABLED_PREFIX = "enabled_"
     private const val KEY_FOLLOWS_PREFIX = "follows_"
-    private const val KEY_LAST_SEEN = "last_seen_created_at"
+    private const val KEY_LAST_SEEN_LEGACY = "last_seen_created_at"
+    private const val KEY_LAST_SEEN_PREFIX = "last_seen_created_at_"
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -59,14 +60,27 @@ object NotificationPreferences {
 
     /**
      * Highest expense createdAt already considered, so a poll never re-notifies
-     * for the same row. A single high-water mark rather than per-uid: it only
-     * needs to move forward.
+     * for the same row. Keyed by uid like the settings above: two accounts on
+     * one phone follow different people, so one marker for both would let the
+     * account that polls first hide expenses from the other.
      */
-    fun lastSeenCreatedAt(context: Context): Long {
-        return prefs(context).getLong(KEY_LAST_SEEN, 0L)
+    fun lastSeenCreatedAt(context: Context, uid: String): Long {
+        if (uid.isBlank()) return 0L
+
+        val stored = prefs(context)
+        val key = KEY_LAST_SEEN_PREFIX + uid
+
+        // Upgrades from the single shared marker inherit it, so the first poll
+        // after updating does not alert for a backlog already seen.
+        return if (stored.contains(key)) {
+            stored.getLong(key, 0L)
+        } else {
+            stored.getLong(KEY_LAST_SEEN_LEGACY, 0L)
+        }
     }
 
-    fun setLastSeenCreatedAt(context: Context, value: Long) {
-        prefs(context).edit().putLong(KEY_LAST_SEEN, value).apply()
+    fun setLastSeenCreatedAt(context: Context, uid: String, value: Long) {
+        if (uid.isBlank()) return
+        prefs(context).edit().putLong(KEY_LAST_SEEN_PREFIX + uid, value).apply()
     }
 }

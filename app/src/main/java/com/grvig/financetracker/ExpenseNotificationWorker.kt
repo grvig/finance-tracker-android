@@ -34,7 +34,8 @@ class ExpenseNotificationWorker(
 
         return try {
 
-            val marker = NotificationPreferences.lastSeenCreatedAt(applicationContext)
+            val marker = NotificationPreferences
+                .lastSeenCreatedAt(applicationContext, uid)
 
             val expenses = ExpenseRepository()
                 .getExpensesCreatedAfter(householdId, marker)
@@ -53,6 +54,7 @@ class ExpenseNotificationWorker(
 
             NotificationPreferences.setLastSeenCreatedAt(
                 applicationContext,
+                uid,
                 selection.newMarker
             )
 
