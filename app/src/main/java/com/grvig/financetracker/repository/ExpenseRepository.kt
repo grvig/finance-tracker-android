@@ -67,6 +67,10 @@ class ExpenseRepository {
      * Only rows newer than the marker are read, so the notification poll costs
      * a handful of documents rather than the whole history, and a long spell
      * offline cannot produce a wall of alerts.
+     *
+     * Unlike the rest of this class it lets failures through. The caller is a
+     * Worker, and a swallowed error would look exactly like "nothing new",
+     * costing it the retry.
      */
     suspend fun getExpensesCreatedAfter(
         householdId: String,
@@ -74,20 +78,16 @@ class ExpenseRepository {
         limit: Long = 20
     ): List<Expense> {
         if (householdId.isBlank()) return emptyList()
-        return try {
-            db.collection("households")
-                .document(householdId)
-                .collection("expenses")
-                .whereGreaterThan("createdAt", createdAfter)
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .limit(limit)
-                .get()
-                .await()
-                .documents
-                .mapNotNull { it.toObject(Expense::class.java) }
-        } catch (e: Exception) {
-            emptyList()
-        }
+        return db.collection("households")
+            .document(householdId)
+            .collection("expenses")
+            .whereGreaterThan("createdAt", createdAfter)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .limit(limit)
+            .get()
+            .await()
+            .documents
+            .mapNotNull { it.toObject(Expense::class.java) }
     }
 
         /**
