@@ -173,6 +173,18 @@ fun NotificationSettingsScreen(
                 fontWeight = FontWeight.SemiBold
             )
 
+            // Polling is skipped entirely while nobody is followed, so the
+            // master switch on its own looks like it does nothing.
+            if (enabled && followed.isEmpty() && members.isNotEmpty()) {
+                Text(
+                    text = "Pick at least one person. Nothing is checked while " +
+                        "this list is empty.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
             if (members.isEmpty()) {
                 Text(
                     text = "No other members in your household yet.",
