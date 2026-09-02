@@ -32,9 +32,14 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
+        <!--
+            Exported because the long press launcher shortcut targets it, and
+            the launcher starts that from its own process. It takes no data in,
+            so the worst another app can do is put an empty card on screen.
+        -->
         <activity
             android:name=".QuickAddActivity"
-            android:exported="false"
+            android:exported="true"
             android:launchMode="singleTop"
             android:excludeFromRecents="true"
             android:taskAffinity=".QuickAdd"
